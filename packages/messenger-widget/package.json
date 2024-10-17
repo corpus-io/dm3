@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@testing-library/dom": "^9.3.1",
-    "@testing-library/jest-dom": "^6.1.3",
+    "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^13.2.1",
     "@types/bootstrap": "^5.2.6",
@@ -60,6 +60,7 @@
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
     "axios-mock-adapter": "^1.22.0",
+    "cypress": "^13.15.0",
     "prettier": "^2.6.2",
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",
@@ -76,7 +77,8 @@
     "lint": "eslint '*/**/*.{js,ts,tsx}' --fix",
     "format": "prettier --write '*/**/*.{js,ts,tsx,json}'",
     "format:check": "prettier --check '*/**/*.{js,ts,tsx,json}'",
-    "test": "CI=true react-app-rewired test --transformIgnorePatterns \"node_modules/(?!dm3-lib-\\w*)/\""
+    "test": "CI=true react-app-rewired test --transformIgnorePatterns \"node_modules/(?!dm3-lib-\\w*)/\"",
+    "cy:open": "cypress open"
   },
   "browserslist": {
     "production": [

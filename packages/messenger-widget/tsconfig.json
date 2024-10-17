@@ -17,9 +17,10 @@
       "skipLibCheck": true,
       "noUnusedLocals": false,
       "noUnusedParameters": false,
-      "noImplicitReturns": false
+      "noImplicitReturns": false,
+      "types": ["cypress"],
     },
-    "include": ["src", "declaration.d.ts"],
+    "include": ["src", "declaration.d.ts", "cypress", "./cypress.d.ts"],
     "exclude": ["node_modules", "lib"],
     "files": ["declaration.d.ts"]
   }
