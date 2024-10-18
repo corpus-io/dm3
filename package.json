@@ -19,6 +19,7 @@
             "packages/integration-tests",
             "packages/offchain-resolver",
             "packages/messenger-widget",
+            "packages/js-sdk",
             "packages/messenger-demo",
             "packages/next-messenger-demo",
             "packages/messenger-web",
