@@ -5,6 +5,7 @@ export default defineConfig({
         devServer: {
             framework: 'create-react-app',
             bundler: 'webpack',
+            webpackConfig: require('./webpack.config'),
         },
         specPattern: '**/*.cy.{js,jsx,ts,tsx}',
     },

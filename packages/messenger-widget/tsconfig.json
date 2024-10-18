@@ -20,7 +20,7 @@
       "noImplicitReturns": false,
       "types": ["cypress"],
     },
-    "include": ["src", "declaration.d.ts", "cypress", "./cypress.d.ts"],
+    "include": ["src", "declaration.d.ts", "cypress", "./cypress.d.ts", "webpack.config.js"],
     "exclude": ["node_modules", "lib"],
     "files": ["declaration.d.ts"]
   }
