@@ -7,6 +7,6 @@ export default defineConfig({
             bundler: 'webpack',
             webpackConfig: require('./webpack.config'),
         },
-        specPattern: '**/*.cy.{js,jsx,ts,tsx}',
+        specPattern: './src/**/*.cy.{js,jsx,ts,tsx}',
     },
 });
