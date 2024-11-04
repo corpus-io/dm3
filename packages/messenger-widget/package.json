@@ -1,7 +1,7 @@
 {
   "name": "@dm3-org/dm3-messenger-widget",
   "license": "BSD-2-Clause",
-  "version": "1.6.0",
+  "version": "1.7.0-lukso-v0.0.1",
   "main": "./lib/cjs/widget.js",
   "module": "./lib/esm/widget.js",
   "types": "./lib/esm/widget.d.ts",
@@ -20,6 +20,7 @@
     "@erc725/erc725.js": "^0.27.1",
     "@popperjs/core": "^2.11.8",
     "@rainbow-me/rainbowkit": "^1.0.6",
+    "@tanstack/query-core": "4.36.1",
     "@testing-library/dom": "^9.3.1",
     "@wagmi/core": "^1.3.8",
     "@web3-name-sdk/core": "^0.1.13",

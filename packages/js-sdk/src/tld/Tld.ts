@@ -3,7 +3,6 @@ import { Dm3Name } from './nameService/Dm3Name';
 import { EthAddressResolver } from './nameService/EthAddress';
 import { EthereumNameService } from './nameService/EthereumNameService';
 import { ForeignName } from './nameService/ForeignName';
-import { Genome } from './nameService/Genome';
 import { ITLDResolver } from './nameService/ITLDResolver';
 import { OptimismNames } from './nameService/OptimismNames';
 import { UniversalProfile } from './nameService/UniversalProfile';
@@ -16,7 +15,7 @@ const SUPPORTED_NAMESERVICES = (
 ): ITLDResolver[] => [
     new EthereumNameService(provider, addressEnsSubdomain, userEnsSubdomain),
     new UniversalProfile(addressEnsSubdomain),
-    new Genome(provider, addressEnsSubdomain),
+    //   new Genome(provider, addressEnsSubdomain),
     new OptimismNames(provider, addressEnsSubdomain),
     new ForeignName(provider, addressEnsSubdomain),
     new Dm3Name(

@@ -1,5 +1,4 @@
 import { ITLDResolver } from './ITLDResolver';
-import { getNameForAddress } from '../../../adapters/offchainResolverApi';
 import { ethers } from 'ethers';
 
 function getIdForAddress(address: string, addrEnsSubdomain: string) {
@@ -63,10 +62,7 @@ export class Dm3Name implements ITLDResolver {
         const addr = ensName.split('.')[0];
         const OFFCHAIN_RESOLVER_ADDRESS = this.resolverBackendUrl!;
 
-        const dm3Name = await getNameForAddress(
-            addr,
-            OFFCHAIN_RESOLVER_ADDRESS,
-        );
+        const dm3Name = await getIdForAddress(addr, OFFCHAIN_RESOLVER_ADDRESS);
         return dm3Name ?? ensName;
     }
 }

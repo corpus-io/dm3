@@ -19,6 +19,7 @@
     "@apollo/client": "^3.11.5",
     "@dm3-org/dm3-lib-profile": "workspace:^",
     "@dm3-org/dm3-lib-shared": "workspace:^",
+    "@erc725/erc725.js": "^0.27.1",
     "ethers": "5.7.2",
     "graphql": "^15.0.0"
   },

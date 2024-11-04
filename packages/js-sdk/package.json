@@ -13,6 +13,7 @@
         "@dm3-org/dm3-lib-shared": "workspace:^",
         "@dm3-org/dm3-lib-storage": "workspace:^",
         "@dm3-org/dm3-lib-test-helper": "workspace:^",
+        "@web3-name-sdk/core": "^0.2.0",
         "axios": "^0.27.2",
         "dotenv": "^16.0.1",
         "ethers": "5.7.2"
@@ -36,5 +37,6 @@
         "ts-jest": "^28.0.4",
         "typescript": "^4.4.2"
     },
+
     "publish": true
 }

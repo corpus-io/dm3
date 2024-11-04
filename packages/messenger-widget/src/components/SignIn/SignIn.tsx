@@ -11,6 +11,7 @@ import DM3Logo from './DM3Logo';
 import { LoginButton } from './LoginButton';
 import './SignIn.css';
 import { changeSignInButtonStyle } from './bl';
+import { LuksoConnector } from '../../hooks/auth/lukso/LuksoConnector';
 declare global {
     interface Window {
         lukso?: any;
@@ -113,6 +114,18 @@ export function SignIn() {
                                 buttonState={ButtonState.Ideal}
                             />
                         )}
+
+                        <LoginButton
+                            text="Test"
+                            onClick={async () => {
+                                const lc = await LuksoConnector._instance(
+                                    dm3Configuration,
+                                );
+                                await lc.test();
+                                console.log('done');
+                            }}
+                            buttonState={ButtonState.Ideal}
+                        />
 
                         <div className="content-data para-div mt-4">
                             <p className="text-primary-color details font-size-12">

@@ -144,10 +144,10 @@ export const useAuth = () => {
                 res;
 
             const ensName = getIdForAddress(
-                controllerAddress,
+                accountAddress,
                 dm3Configuration.addressEnsSubdomain,
             );
-            _setAccount(ensName, controllerAddress, profile, profileKeys);
+            _setAccount(ensName, accountAddress, profile, profileKeys);
             return;
         }
 

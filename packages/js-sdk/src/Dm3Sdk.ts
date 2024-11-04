@@ -20,8 +20,20 @@ export function getIdForAddress(address: string, addrEnsSubdomain: string) {
     return address + addrEnsSubdomain;
 }
 
+export interface Dm3SdkConfig {
+    mainnetProvider: ethers.providers.JsonRpcProvider;
+    nonce: string;
+    defaultDeliveryService: string;
+    addressEnsSubdomain: string;
+    userEnsSubdomain: string;
+    resolverBackendUrl: string;
+    backendUrl: string;
+    lukso?: ethers.providers.ExternalProvider;
+}
+
 export class Dm3Sdk {
     private readonly mainnetProvider: ethers.providers.JsonRpcProvider;
+    private readonly lukso?: ethers.providers.ExternalProvider;
 
     /**
      * DM3 ENVIRONMENT
@@ -49,25 +61,21 @@ export class Dm3Sdk {
      */
     public conversations: Conversations;
 
-    constructor(
-        mainnetProvider: ethers.providers.JsonRpcProvider,
-        nonce: string,
-        defaultDeliveryService: string,
-        addressEnsSubdomain: string,
-        userEnsSubdomain: string,
-        resolverBackendUrl: string,
-        backendUrl: string,
-    ) {
-        this.mainnetProvider = mainnetProvider;
-        this.nonce = nonce;
-        this.defaultDeliveryService = defaultDeliveryService;
-        this.addressEnsSubdomain = addressEnsSubdomain;
-        this.userEnsSubdomain = userEnsSubdomain;
-        this.resolverBackendUrl = resolverBackendUrl;
-        this.backendUrl = backendUrl;
+    constructor(config: Dm3SdkConfig) {
+        this.mainnetProvider = config.mainnetProvider;
+        this.nonce = config.nonce;
+        this.defaultDeliveryService = config.defaultDeliveryService;
+        this.addressEnsSubdomain = config.addressEnsSubdomain;
+        this.userEnsSubdomain = config.userEnsSubdomain;
+        this.resolverBackendUrl = config.resolverBackendUrl;
+        this.backendUrl = config.backendUrl;
+        this.lukso = config.lukso;
     }
 
     public async universalProfileLogin() {
+        if (!this.lukso) {
+            throw new Error('Lukso provider not found');
+        }
         const tld = new Tld(
             this.mainnetProvider,
             this.addressEnsSubdomain,
@@ -75,6 +83,7 @@ export class Dm3Sdk {
             this.resolverBackendUrl,
         );
         const lc = await LuksoConnector._instance(
+            this.lukso,
             this.nonce,
             this.defaultDeliveryService,
         );

@@ -2231,6 +2231,7 @@ __metadata:
     "@dm3-org/dm3-lib-storage": "workspace:^"
     "@dm3-org/dm3-lib-test-helper": "workspace:^"
     "@types/supertest": ^2.0.12
+    "@web3-name-sdk/core": ^0.2.0
     axios: ^0.27.2
     babel-cli: ^6.26.0
     babel-jest: ^29.2.2
@@ -9066,6 +9067,23 @@ __metadata:
     "@solana/web3.js": ^1.75.0
     viem: ">=1.0.0"
   checksum: 13c268976fab16248668071cdaaf288061a7d3ce191e20c8f8cc9412225e2700439da2ac917621caa99aab16403c6fe33088d64e1599b16b989bf773b6ce8819
+  languageName: node
+  linkType: hard
+
+"@web3-name-sdk/core@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@web3-name-sdk/core@npm:0.2.0"
+  dependencies:
+    "@adraffy/ens-normalize": ^1.10.0
+    "@ensdomains/ens-validation": ^0.1.0
+  peerDependencies:
+    "@bonfida/spl-name-service": ^2.5.1
+    "@sei-js/core": ^3.1.0
+    "@siddomains/injective-sidjs": 0.0.2-beta
+    "@siddomains/sei-sidjs": ^0.0.4
+    "@solana/web3.js": ^1.75.0
+    viem: ^2.15.1
+  checksum: eda8f5966ecc5290b83b4a6ec4208760ea9ff0bfcea1111011e69fd4f4ee0c0502f08faf2446c850b115c122905648844e5c7d8961782fe5fb8a904e7e0e92ec
   languageName: node
   linkType: hard
 
