@@ -19,7 +19,7 @@ export class EthAddressResolver implements ITLDResolver {
         return ensName.split('.')[0];
     }
     //The alias format is used to store the contact in the DB
-    //e.g. 0x1234 -> 0x1234.user.dm3.eth
+    //e.g. 0x1234 -> 0x1234.addr.dm3.eth
     async resolveTLDtoAlias(address: string): Promise<string> {
         return address + this.addrEnsSubdomain;
     }

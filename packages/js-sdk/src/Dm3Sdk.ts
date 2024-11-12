@@ -14,6 +14,13 @@ import { ethers } from 'ethers';
 import { Tld } from './tld/Tld';
 import { Dm3 } from './Dm3';
 
+/**
+ * DM3SDK
+ * -contacts
+ * -message
+ * -profile
+ */
+
 const DEFAULT_CONVERSATION_PAGE_SIZE = 10;
 
 export function getIdForAddress(address: string, addrEnsSubdomain: string) {
@@ -62,14 +69,17 @@ export class Dm3Sdk {
     public conversations: Conversations;
 
     constructor(config: Dm3SdkConfig) {
+        //TODO keep ethers v5 for know but extract into common interface later
         this.mainnetProvider = config.mainnetProvider;
         this.nonce = config.nonce;
+        //TODO make the name more concise and make it a array -> defaultDeliveryServiceEnsNames
         this.defaultDeliveryService = config.defaultDeliveryService;
         this.addressEnsSubdomain = config.addressEnsSubdomain;
         this.userEnsSubdomain = config.userEnsSubdomain;
         this.resolverBackendUrl = config.resolverBackendUrl;
-        this.backendUrl = config.backendUrl;
+        //this.backendUrl = config.backendUrl;
         this.lukso = config.lukso;
+        this.storageApi = config.storageApi;
     }
 
     public async universalProfileLogin() {

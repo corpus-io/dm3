@@ -4,20 +4,24 @@ import {
     getAccountDisplayName,
 } from '@dm3-org/dm3-lib-profile';
 
-export interface Contact {
-    account: Account;
-    deliveryServiceProfiles: DeliveryServiceProfile[];
+class Messages {
+    public readonly list: string[];
+    public addMessage(message: string) {}
 }
 
-export interface ContactPreview {
+interface Contact {
     name: string;
     contactProfileLocation: string[];
-    message: string | undefined;
     image: string;
-    contactDetails: Contact;
     isHidden: boolean;
     messageSizeLimit: number;
     updatedAt: number;
+    account: Account;
+    deliveryServiceProfiles: DeliveryServiceProfile[];
+}
+export interface Conversation {
+    messages: Messages;
+    contact: Contact;
 }
 
 export const getEmptyContact = (
@@ -27,17 +31,15 @@ export const getEmptyContact = (
     updatedAt: number,
     contactProfileLocation: string[],
 ) => {
-    const newContact: ContactPreview = {
+    const newContact: Contact = {
         name: getAccountDisplayName(ensName, 25),
         contactProfileLocation,
-        message,
+        previewMessage: message,
         image: '',
-        contactDetails: {
-            account: {
-                ensName,
-            },
-            deliveryServiceProfiles: [],
+        account: {
+            ensName,
         },
+        deliveryServiceProfiles: [],
         isHidden,
         messageSizeLimit: 0,
         updatedAt: updatedAt,

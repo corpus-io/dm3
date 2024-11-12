@@ -24,8 +24,9 @@ describe('Dm3Sdk', () => {
             backendUrl: 'backend.io',
         };
 
-        const sdk = new Dm3Sdk(mockConfig);
-
-        const dm3 = await sdk.universalProfileLogin();
+        const dm3 = await new Dm3Sdk().universalProfileLogin();
+        await dm3.conversations.addConversation('karl.eth');
+        const c = dm3.conversations.list;
+        const karl = c[0];
     });
 });
