@@ -49,6 +49,7 @@
     font-style: italic;
     color: var(--error-text);
     margin-left: 1rem;
+    display: inline-table;
 }
 
 .add-name-container {

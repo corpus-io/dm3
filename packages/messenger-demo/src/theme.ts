@@ -45,4 +45,5 @@ export const themeColors = {
     alternateContactBackgroundColor: 'black',
     menuBackgroundColor: 'blue',
     preferencesHighlightedColor: '#8b7ff4',
+    configureProfileModalBackgroundColor: '#D9D9D9',
 };

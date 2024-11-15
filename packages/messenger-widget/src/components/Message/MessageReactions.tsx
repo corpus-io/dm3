@@ -33,7 +33,7 @@ export function MessageReactions(props: MessageProps) {
             throw Error('no contact selected');
         }
 
-        const messageHash = deleteEmojiData.metadata?.encryptedMessageHash;
+        const messageHash = deleteEmojiData.metadata?.messageHash;
 
         setMessageView({
             actionType: MessageActionType.NONE,

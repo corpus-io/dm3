@@ -3,22 +3,27 @@ import { useContext, useEffect, useState } from 'react';
 import { useChainId, useSwitchNetwork } from 'wagmi';
 import { AuthContext } from '../../../../context/AuthContext';
 import { ConfigureDM3NameContext } from '../../context/ConfigureDM3NameContext';
-import { closeLoader, startLoader } from './../../../Loader/Loader';
-import { IChain, NAME_TYPE } from './../../chain/common';
-import { DM3Name } from './../DM3Name';
+import { closeLoader, startLoader } from '../../../Loader/Loader';
+import { IChain, NAME_TYPE } from '../../chain/common';
+import { DM3Name } from '../DM3Name';
 import { publishProfile } from './tx/publishProfile';
 import { registerOpName } from './tx/registerOpName';
 import { ModalContext } from '../../../../context/ModalContext';
 import { fetchChainIdFromDM3ServiceName } from '../../bl';
 import { DM3ConfigurationContext } from '../../../../context/DM3ConfigurationContext';
 import { ConfigureProfileContext } from '../../context/ConfigureProfileContext';
+import { ProfileScreenType } from '../../../../utils/enum-type-utils';
 
 export const ConfigureOptimismNameProfile = (props: IChain) => {
     const connectedChainId = useChainId();
 
     const { switchNetwork } = useSwitchNetwork();
 
-    const { setLoaderContent } = useContext(ModalContext);
+    const {
+        setLoaderContent,
+        configureProfileModal,
+        setConfigureProfileModal,
+    } = useContext(ModalContext);
 
     const { account, setDisplayName } = useContext(AuthContext);
 
@@ -89,6 +94,10 @@ export const ConfigureOptimismNameProfile = (props: IChain) => {
 
             setDisplayName(ensName);
             setExistingDm3Name(ensName);
+            setConfigureProfileModal({
+                ...configureProfileModal,
+                onScreen: ProfileScreenType.NONE,
+            });
         } catch (e) {
             // check user rejects
             setError('Name is not available', NAME_TYPE.DM3_NAME);

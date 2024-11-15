@@ -4,7 +4,7 @@ import { isSpam } from '.';
 import { testData } from '../../../../../test-data/encrypted-envelops.test';
 
 import { SpamFilterRules } from './SpamFilterRules';
-import { Session } from '@dm3-org/dm3-lib-delivery';
+import { Account } from '@dm3-org/dm3-lib-delivery';
 
 const keysA = {
     encryptionKeyPair: {
@@ -48,13 +48,13 @@ const connection = {
 describe('SpamFilter', () => {
     describe('isSpam ', () => {
         it('Should filter correctly with one filter criteria', async () => {
-            const session = {
+            const account = {
                 spamFilterRules: { minBalance: '1' },
-            } as Session & { spamFilterRules: SpamFilterRules };
+            } as Account & { spamFilterRules: SpamFilterRules };
 
             const envelopAIsSpam = await isSpam(
                 connection.provider,
-                session,
+                account,
                 JSON.parse(
                     await decryptAsymmetric(
                         keysA.encryptionKeyPair,
@@ -66,7 +66,7 @@ describe('SpamFilter', () => {
             );
             const envelopBIsSpam = await isSpam(
                 connection.provider,
-                session,
+                account,
                 JSON.parse(
                     await decryptAsymmetric(
                         keysA.encryptionKeyPair,
@@ -81,13 +81,13 @@ describe('SpamFilter', () => {
             await expect(envelopBIsSpam).toBe(false);
         });
         it('Should use filter correctly with two filter criteria', async () => {
-            const session = {
+            const account = {
                 spamFilterRules: { minBalance: '1', minNonce: 2 },
-            } as Session & { spamFilterRules: SpamFilterRules };
+            } as Account & { spamFilterRules: SpamFilterRules };
 
             const envelopAIsSpam = await isSpam(
                 connection.provider,
-                session,
+                account,
                 JSON.parse(
                     await decryptAsymmetric(
                         keysA.encryptionKeyPair,
@@ -99,7 +99,7 @@ describe('SpamFilter', () => {
             );
             const envelopBIsSpam = await isSpam(
                 connection.provider,
-                session,
+                account,
                 JSON.parse(
                     await decryptAsymmetric(
                         keysA.encryptionKeyPair,
@@ -114,13 +114,13 @@ describe('SpamFilter', () => {
             await expect(envelopBIsSpam).toBe(true);
         });
         it('Should not consider a message as spam if no SpamFilterRules are provided', async () => {
-            const session = {} as Session & {
+            const account = {} as Account & {
                 spamFilterRules: SpamFilterRules;
             };
 
             const envelopAIsSpam = await isSpam(
                 connection.provider,
-                session,
+                account,
                 JSON.parse(
                     await decryptAsymmetric(
                         keysA.encryptionKeyPair,

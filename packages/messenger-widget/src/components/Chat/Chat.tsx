@@ -13,6 +13,7 @@ import { MessageInputBox } from '../MessageInputBox/MessageInputBox';
 import { scrollToBottomOfChat } from './scrollToBottomOfChat';
 import { ModalContext } from '../../context/ModalContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { MessagePropsModel } from '../../interfaces/utils';
 
 export function Chat() {
     const { account } = useContext(AuthContext);
@@ -46,6 +47,50 @@ export function Chat() {
         }
     };
 
+    // This function adds a property called showProfile which is of type boolean
+    // It helps to indicate whether a profile preview has to be shown with message or not
+    // It also adds a property isFirstMsgofDay which indicates its a first message of particular day
+    const formatMessages = (
+        messageList: MessageModel[],
+    ): MessagePropsModel[] => {
+        // The message list is reversed and then property is added because the pagination library
+        // reverses the message list and then it is visible.
+        // So to keep profile preview updated list is reversed
+        const list = messageList.reverse().map((m, index) => {
+            // the sender or current message
+            const currentMsgSender = m.envelop.message.metadata?.from;
+            // the sender of message before the current message
+            const lastMsgSender = index
+                ? messageList[index - 1].envelop.message.metadata?.from
+                : '';
+            // the date on which current message was sent
+            const currentMsgDate = new Date(
+                Number(m.envelop.message.metadata?.timestamp),
+            ).getDate();
+            // the date on which last message was sent
+            const lastMsgDate = index
+                ? new Date(
+                      Number(
+                          messageList[index - 1].envelop.message.metadata
+                              ?.timestamp,
+                      ),
+                  ).getDate()
+                : 0;
+            return {
+                ...m,
+                // if its not a first message and last 2 messages sender is same then no need to show
+                // profile for this message otherwise show profile
+                showProfile: !(index && currentMsgSender === lastMsgSender),
+                // if the index is 0, then its first message of specific date, so set to true
+                // otherwise check 2 dates, if they are same then its not first msg else it is first msg of day
+                isFirstMsgOfDay: !index ? true : lastMsgDate !== currentMsgDate,
+            };
+        });
+
+        // after setting the property, the list is returned back in actual order
+        return list.reverse();
+    };
+
     useEffect(() => {
         if (!selectedContact) {
             return;
@@ -59,7 +104,9 @@ export function Chat() {
         if (!selectedContact) {
             return [];
         }
-        return getMessages(selectedContact.contactDetails.account.ensName!);
+        return formatMessages(
+            getMessages(selectedContact.contactDetails.account.ensName!),
+        );
     }, [getMessages, selectedContact]);
 
     // handles messages list
@@ -192,7 +239,10 @@ export function Chat() {
                         >
                             {messages.length > 0 &&
                                 messages.map(
-                                    (messageModel: MessageModel, index) => (
+                                    (
+                                        messageModel: MessagePropsModel,
+                                        index,
+                                    ) => (
                                         <div key={index} className="mt-2">
                                             <Message
                                                 message={
@@ -220,6 +270,12 @@ export function Chat() {
                                                 }
                                                 indicator={
                                                     messageModel.indicator
+                                                }
+                                                showProfile={
+                                                    messageModel.showProfile
+                                                }
+                                                isFirstMsgOfDay={
+                                                    messageModel.isFirstMsgOfDay
                                                 }
                                             />
                                         </div>

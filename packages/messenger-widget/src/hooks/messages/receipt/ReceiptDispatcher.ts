@@ -31,7 +31,7 @@ export class ReceiptDispatcher {
             this.account!.ensName,
             'READ_OPENED',
             this.profileKeys?.signingKeyPair.privateKey!,
-            messageModel.envelop.metadata?.encryptedMessageHash as string,
+            messageModel.envelop.metadata?.messageHash as string,
         );
 
         //add the message to dispatch it via useMessage hook
@@ -47,7 +47,7 @@ export class ReceiptDispatcher {
             this.account!.ensName,
             'READ_RECEIVED',
             this.profileKeys?.signingKeyPair.privateKey!,
-            messageModel.envelop.metadata?.encryptedMessageHash as string,
+            messageModel.envelop.metadata?.messageHash as string,
         );
 
         //add the message to dispatch it via useMessage hook
@@ -71,8 +71,11 @@ export class ReceiptDispatcher {
         contactAliasName: string,
         messageModel: MessageModel,
     ) {
-        //We only want to acknowledge messages from type NEW. Every other message type can be neglected for now
-        const msgIsNew = messageModel.envelop.message.metadata.type === 'NEW';
+        //We only want to acknowledge messages from type NEW or REPLY. Every other message type can be neglected for now
+        const shouldAcknowledgeMessage =
+            messageModel.envelop.message.metadata.type === 'NEW' ||
+            messageModel.envelop.message.metadata.type === 'EDIT' ||
+            messageModel.envelop.message.metadata.type === 'REPLY';
         //Check if the selected contact is the sender of the message.
         // If that is the case we've to acknowledge the message and send a READ_OPENED acknowledgement to the sender
         const selectedContactIsSender =
@@ -80,15 +83,15 @@ export class ReceiptDispatcher {
             contactAliasName;
 
         //We acknowledge that we've received the message by sending a READ_RECEIVED acknowledgement to the sender
-        if (msgIsNew) {
+        if (shouldAcknowledgeMessage) {
             await this.sendReceivedReceipte(contactAliasName, messageModel);
             console.log('sent received receipt to ', contactAliasName);
         }
 
-        if (msgIsNew && selectedContactIsSender) {
+        if (shouldAcknowledgeMessage && selectedContactIsSender) {
             // if contact is selected then send READ_OPENED acknowledgement to sender for new message received
             await this.sendOpendReceipt(contactAliasName, messageModel);
-            console.log('sent opend receipt to ', contactAliasName);
+            console.log('sent opened receipt to ', contactAliasName);
         }
     }
 }

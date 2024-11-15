@@ -25,6 +25,8 @@ export interface MessageProps {
     isLastMessage?: boolean;
     hideFunction?: string;
     indicator?: MessageIndicator;
+    showProfile?: boolean;
+    isFirstMsgOfDay?: boolean;
 }
 
 export interface MessageAction {

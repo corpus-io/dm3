@@ -21,9 +21,17 @@ export const onSubmitMessage = async (
     account: Account,
     selectedContact: ContactPreview,
 ) => {
+    // Message can't be empty if no files are selected & its not DELETE msg.
+    if (
+        messageView.actionType !== MessageActionType.DELETE &&
+        !props.filesSelected.length &&
+        (!props.message || props.message.trim() === '')
+    ) {
+        return;
+    }
     if (messageView.actionType === MessageActionType.REPLY) {
         const referenceMessageHash =
-            messageView.messageData?.envelop.metadata?.encryptedMessageHash;
+            messageView.messageData?.envelop.metadata?.messageHash;
 
         const messageData = await createReplyMessage(
             selectedContact?.contactDetails.account.ensName!,
@@ -59,7 +67,7 @@ export const onSubmitMessage = async (
     }
     if (messageView.actionType === MessageActionType.EDIT) {
         const referenceMessageHash =
-            messageView.messageData?.envelop.metadata?.encryptedMessageHash;
+            messageView.messageData?.envelop.metadata?.messageHash;
 
         // reply to the original message
         const messageData = await createEditMessage(

@@ -12,6 +12,9 @@ export function Action(props: MessageProps) {
     const [isHovered, setIsHovered] = useState(false);
 
     const handleMouseOver = () => {
+        if (!props.envelop.metadata?.messageHash) {
+            return;
+        }
         setIsHovered(true);
     };
 
@@ -31,6 +34,7 @@ export function Action(props: MessageProps) {
         <div
             className={'msg-action-container d-flex pointer-cursor border-radius-3 position-relative'.concat(
                 ' ',
+                !props.envelop.metadata?.messageHash ? 'invisible' : '',
                 selectedContact?.contactDetails.account.profile && !isMsgDeleted
                     ? ''
                     : 'hide-action',

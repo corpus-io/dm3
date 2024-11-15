@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import express from 'express';
 import { verify } from 'jsonwebtoken';
 import request from 'supertest';
-import { Auth } from './auth';
+import { Authenticate } from './authenticate';
 import { IAccountDatabase } from './iAccountDatabase';
 import { createChallenge } from './Keys';
 import { sign } from '@dm3-org/dm3-lib-crypto';
@@ -70,7 +70,11 @@ describe('Auth', () => {
                 const app = express();
                 app.use(bodyParser.json());
                 app.use(
-                    Auth(mockDbWithAccount, serverSecret, mockWeb3Provider),
+                    Authenticate(
+                        mockDbWithAccount,
+                        serverSecret,
+                        mockWeb3Provider,
+                    ),
                 );
 
                 const response = await request(app)
@@ -136,14 +140,18 @@ describe('Auth', () => {
         });
     });
 
-    describe('createNewSessionToken', () => {
+    describe('createNewAccountToken', () => {
         describe('schema', () => {
             it('Returns 400 if signature is invalid', async () => {
                 const app = express();
 
                 app.use(bodyParser.json());
                 app.use(
-                    Auth(mockDbWithAccount, serverSecret, mockWeb3Provider),
+                    Authenticate(
+                        mockDbWithAccount,
+                        serverSecret,
+                        mockWeb3Provider,
+                    ),
                 );
 
                 // create the challenge jwt
@@ -172,7 +180,11 @@ describe('Auth', () => {
 
                 app.use(bodyParser.json());
                 app.use(
-                    Auth(mockDbWithAccount, serverSecret, mockWeb3Provider),
+                    Authenticate(
+                        mockDbWithAccount,
+                        serverSecret,
+                        mockWeb3Provider,
+                    ),
                 );
 
                 // create the challenge jwt
@@ -207,7 +219,11 @@ describe('Auth', () => {
 
                 app.use(bodyParser.json());
                 app.use(
-                    Auth(mockDbWithAccount, serverSecret, mockWeb3Provider),
+                    Authenticate(
+                        mockDbWithAccount,
+                        serverSecret,
+                        mockWeb3Provider,
+                    ),
                 );
 
                 const { status } = await request(app).post(`/somename`).send({
@@ -221,7 +237,11 @@ describe('Auth', () => {
 
                 app.use(bodyParser.json());
                 app.use(
-                    Auth(mockDbWithAccount, serverSecret, mockWeb3Provider),
+                    Authenticate(
+                        mockDbWithAccount,
+                        serverSecret,
+                        mockWeb3Provider,
+                    ),
                 );
 
                 // create the challenge jwt

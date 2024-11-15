@@ -92,132 +92,6 @@ describe('useMessage hook test cases', () => {
         });
         const config: DM3Configuration = configurationContext.dm3Configuration!;
 
-        it('should not add empty message', async () => {
-            const storageContext = getMockedStorageContext({
-                editMessageBatchAsync: jest.fn(),
-                storeMessageBatch: jest.fn(),
-                storeMessage: jest.fn(),
-            });
-            const conversationContext = getMockedConversationContext({
-                selectedContact: getEmptyContact(
-                    'max.eth',
-                    undefined,
-                    false,
-                    0,
-                    [],
-                ),
-            });
-            const deliveryServiceContext = getMockedDeliveryServiceContext({
-                //Add websocket mock
-                onNewMessage: (cb: Function) => {
-                    console.log('on new message');
-                },
-                removeOnNewMessageListener: jest.fn(),
-            });
-            const authContext = getMockedAuthContext({});
-            const tldContext = getMockedTldContext({});
-
-            const wrapper = ({ children }: { children: any }) => (
-                <>
-                    <AuthContext.Provider value={authContext}>
-                        <TLDContext.Provider value={tldContext}>
-                            <StorageContext.Provider value={storageContext}>
-                                <ConversationContext.Provider
-                                    value={conversationContext}
-                                >
-                                    <DeliveryServiceContext.Provider
-                                        value={deliveryServiceContext}
-                                    >
-                                        {children}
-                                    </DeliveryServiceContext.Provider>
-                                </ConversationContext.Provider>
-                            </StorageContext.Provider>
-                        </TLDContext.Provider>
-                    </AuthContext.Provider>
-                </>
-            );
-
-            const { result } = renderHook(() => useMessage(), {
-                wrapper,
-            });
-            await waitFor(() =>
-                expect(result.current.contactIsLoading('max.eth')).toBe(false),
-            );
-
-            const messageFactory = MockMessageFactory(sender, receiver, ds1);
-            const message = await messageFactory.createMessage('');
-            const addMessageResult = await waitFor(() =>
-                result.current.addMessage('max.eth', message),
-            );
-
-            expect(addMessageResult).toEqual({
-                isSuccess: false,
-                error: 'Message is empty',
-            });
-        });
-        it('should trim message', async () => {
-            const storageContext = getMockedStorageContext({
-                editMessageBatchAsync: jest.fn(),
-                storeMessageBatch: jest.fn(),
-                storeMessage: jest.fn(),
-            });
-            const conversationContext = getMockedConversationContext({
-                selectedContact: getEmptyContact(
-                    'max.eth',
-                    undefined,
-                    false,
-                    0,
-                    [],
-                ),
-            });
-            const deliveryServiceContext = getMockedDeliveryServiceContext({
-                //Add websocket mock
-                onNewMessage: (cb: Function) => {
-                    console.log('on new message');
-                },
-                removeOnNewMessageListener: jest.fn(),
-            });
-            const authContext = getMockedAuthContext({});
-            const tldContext = getMockedTldContext({});
-
-            const wrapper = ({ children }: { children: any }) => (
-                <>
-                    <AuthContext.Provider value={authContext}>
-                        <TLDContext.Provider value={tldContext}>
-                            <StorageContext.Provider value={storageContext}>
-                                <ConversationContext.Provider
-                                    value={conversationContext}
-                                >
-                                    <DeliveryServiceContext.Provider
-                                        value={deliveryServiceContext}
-                                    >
-                                        {children}
-                                    </DeliveryServiceContext.Provider>
-                                </ConversationContext.Provider>
-                            </StorageContext.Provider>
-                        </TLDContext.Provider>
-                    </AuthContext.Provider>
-                </>
-            );
-
-            const { result } = renderHook(() => useMessage(), {
-                wrapper,
-            });
-            await waitFor(() =>
-                expect(result.current.contactIsLoading('max.eth')).toBe(false),
-            );
-
-            const messageFactory = MockMessageFactory(sender, receiver, ds1);
-            const message = await messageFactory.createMessage('         ');
-            const addMessageResult = await waitFor(() =>
-                result.current.addMessage('max.eth', message),
-            );
-
-            expect(addMessageResult).toEqual({
-                isSuccess: false,
-                error: 'Message is empty',
-            });
-        });
         it('should add message', async () => {
             const storageContext = getMockedStorageContext({
                 editMessageBatchAsync: jest.fn(),
@@ -868,15 +742,15 @@ describe('useMessage hook test cases', () => {
                 [
                     {
                         contactAddress: sender.account.ensName,
-                        messageHash: message1.metadata.encryptedMessageHash,
+                        messageHash: message1.metadata.messageHash,
                     },
                     {
                         contactAddress: sender.account.ensName,
-                        messageHash: message2.metadata.encryptedMessageHash,
+                        messageHash: message2.metadata.messageHash,
                     },
                     {
                         contactAddress: sender.account.ensName,
-                        messageHash: message3.metadata.encryptedMessageHash,
+                        messageHash: message3.metadata.messageHash,
                     },
                 ],
             );

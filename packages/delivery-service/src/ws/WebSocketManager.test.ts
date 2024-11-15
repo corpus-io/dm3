@@ -94,7 +94,7 @@ describe('WebSocketManager', () => {
 
             expect(socket0IsConnected).toBe(false);
         });
-        it('reject socket without session', async () => {
+        it('reject socket without account', async () => {
             const mockedWeb3Provider = {
                 resolveName: (_: string) => Promise.resolve('0x'),
             } as any;
@@ -173,7 +173,7 @@ describe('WebSocketManager', () => {
         });
     });
     describe('isConnected', () => {
-        it('returns true if name has one session', async () => {
+        it('returns true if name has one account', async () => {
             const mockedWeb3Provider = {
                 resolveName: (_: string) => Promise.resolve(receiver.address),
             } as any;
@@ -222,7 +222,7 @@ describe('WebSocketManager', () => {
             const isConnected = await wsManager.isConnected(receiver.address);
             expect(isConnected).toBe(true);
         });
-        it('returns true if name has at least one session', async () => {
+        it('returns true if name has at least one account', async () => {
             const mockedWeb3Provider = {
                 resolveName: (_: string) => Promise.resolve(receiver.address),
             } as any;
@@ -345,7 +345,7 @@ describe('WebSocketManager', () => {
             const isConnected = await wsManager.isConnected(rando.address);
             expect(isConnected).toBe(false);
         });
-        it('keeps track of different independent sessions', async () => {
+        it('keeps track of different independent accounts', async () => {
             const mockedWeb3Provider = {
                 resolveName: (_: string) => {
                     if (_ === receiver.account.ensName) {

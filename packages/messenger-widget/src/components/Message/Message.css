@@ -1,10 +1,13 @@
 .content-style {
     padding: 10px;
-    max-width: 38rem;
     margin-right: 0.4rem;
     font-size: 14px;
     word-break: break-word;
     hyphens: auto;
+}
+
+.old-content-style {
+    max-width: 38rem;
 }
 
 .action-container {
@@ -80,8 +83,12 @@
     background-color: var(--scrollbar-background-color);
 }
 
-.contact-reacted-msg {
+.old-contact-reacted-msg {
     border-bottom-left-radius: 0px !important;
+}
+
+.contact-reacted-msg {
+    border-bottom-right-radius: 0px !important;
 }
 
 .own-reacted-msg {
@@ -94,6 +101,7 @@
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
     font-size: 14px;
+    margin-right: 1px;
 }
 
 .own-deleted-msg {
@@ -150,10 +158,45 @@
     color: var(--text-primary-color);
 }
 
+.chat-profile-pic{
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 3px;
+}
+
+.msg-group-head {
+    display: flex;
+    flex-direction: row;
+    color: #FFFFFF;
+    font-size: 13px;
+    margin-bottom: 0.7rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.msg-group-head:before,
+.msg-group-head:after {
+    content: "";
+    flex: 1 1;
+    border-bottom: 1px solid #FFFFFF;
+    margin: auto;
+}
+
+.msg-group-head:before {
+    margin-right: 5px;
+}
+
+.msg-group-head:after {
+    margin-left: 5px;
+}
+
 /* =================== Mobile Responsive CSS =================== */
 @media only screen and (max-width: 800px) {
     .content-style {
         font-size: 12px;
+    }
+    
+    .old-content-style{
         max-width: 19rem;
     }
 

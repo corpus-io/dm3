@@ -1,4 +1,4 @@
-import { Session } from '@dm3-org/dm3-lib-delivery';
+import { Account } from '@dm3-org/dm3-lib-delivery';
 import { EncryptionEnvelop } from '@dm3-org/dm3-lib-messaging';
 import { UserProfile } from '@dm3-org/dm3-lib-profile';
 import { IWebSocketManager, ethersHelper } from '@dm3-org/dm3-lib-shared';
@@ -50,7 +50,7 @@ describe('Messaging', () => {
         const isReceiver =
             ethersHelper.formatAddress(address) === receiver.address;
 
-        const session = (
+        const account = (
             account: string,
             token: string,
             profile: UserProfile,
@@ -64,11 +64,11 @@ describe('Messaging', () => {
         });
 
         if (isSender) {
-            return session(sender.address, '123', emptyProfile);
+            return account(sender.address, '123', emptyProfile);
         }
 
         if (isReceiver) {
-            return session(receiver.address, 'abc', {
+            return account(receiver.address, 'abc', {
                 ...emptyProfile,
                 publicEncryptionKey:
                     receiver.profileKeys.encryptionKeyPair.publicKey,
@@ -198,14 +198,14 @@ describe('Messaging', () => {
                 done();
             });
 
-            const session = async (addr: string) => {
+            const account = async (addr: string) => {
                 return {
                     ...(await getAccount(addr)),
                     spamFilterRules: { minNonce: 2 },
-                } as Session;
+                } as Account;
             };
             const db = {
-                getAccount: session,
+                getAccount: account,
                 createMessage: () => {},
                 getIdEnsName: async (ensName: string) => ensName,
                 getUsersNotificationChannels: () => Promise.resolve([]),

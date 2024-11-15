@@ -20,19 +20,17 @@ export const renderMessage = (messages: MessageModel[]) => {
     const withReactions = renderReactions(withDeletes);
     const withReply = renderReply(withReactions);
 
-    //Its desirable to have all messages in a conversation sorted by their timestamp. However edited messages are an
-    //exception to this rule, since they should be displayed in the order they were edited.
-    // Therefore we sort the messages by their timestamp and then we eventually replace messages that have been edited
-    //Messages are sorted DESC, so the pagination adds old messages at the end of the array
-    withReply.sort(
-        (a, b) =>
-            b.envelop.message.metadata.timestamp -
-            a.envelop.message.metadata.timestamp,
-    );
     const withoutEdited = renderEdit(withReply);
+    //Sort the messages by timestamp DESC to show them in the right order
+    // withoutEdited.sort(
+    //     (a, b) =>
+    //         b.envelop.message.metadata.timestamp -
+    //         a.envelop.message.metadata.timestamp,
+    // );
 
     //There a several ways a message can added to the client. I.e via Websocket, multiple DS or from the storage.
     //This leads occasionally to duplicates we don't want to display.
     const withoutDuplicates = renderDuplicates(withoutEdited);
-    return withoutDuplicates;
+    //We reverse the array to display the messages in the right order
+    return withoutDuplicates.reverse();
 };

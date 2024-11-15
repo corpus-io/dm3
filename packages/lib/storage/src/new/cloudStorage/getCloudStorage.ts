@@ -147,8 +147,7 @@ export const getCloudStorage = (
         await backendConnector.addMessage(
             ensName,
             encryptedContactName,
-            envelop.envelop.metadata?.encryptedMessageHash! ??
-                envelop.envelop.id,
+            envelop.envelop.metadata?.messageHash! ?? envelop.envelop.id,
             createdAt,
             encryptedEnvelopContainer,
             isHalted,
@@ -178,7 +177,7 @@ export const getCloudStorage = (
                         createdAt,
                         messageId:
                             storageEnvelopContainer.envelop.metadata
-                                ?.encryptedMessageHash! ??
+                                ?.messageHash! ??
                             storageEnvelopContainer.envelop.id,
                         isHalted: false,
                     };
@@ -215,7 +214,7 @@ export const getCloudStorage = (
                         encryptedEnvelopContainer,
                         messageId:
                             storageEnvelopContainer.envelop.metadata
-                                ?.encryptedMessageHash!,
+                                ?.messageHash!,
                         createdAt,
                         isHalted: false,
                     };

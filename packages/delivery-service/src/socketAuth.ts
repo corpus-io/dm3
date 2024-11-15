@@ -33,15 +33,15 @@ export function socketAuth(
                 console.log('check token has failed for WS ');
                 return next(new Error('check token has failed for WS'));
             }
-            const session = await db.getAccount(ensName);
-            if (!session) {
-                throw Error('Could not get session');
+            const account = await db.getAccount(ensName);
+            if (!account) {
+                throw Error('Could not get account');
             }
-            //we use session.account here as a key for setAccount here.
-            //We can do this because the address is used as account when the Session has been created.
+            //we use account.account here as a key for setAccount here.
+            //We can do this because the address is used as account when the Account has been created.
             //That saves a address lookup via ENS
-            await db.setAccount(session.account, {
-                ...session,
+            await db.setAccount(account.account, {
+                ...account,
                 socketId: socket.id,
             });
         } catch (e) {

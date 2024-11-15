@@ -35,6 +35,7 @@
     cursor: pointer;
     padding: 0.5rem 1.3rem 0.5rem 1.3rem;
     font-size: 1rem;
+    align-items: center;
 }
 
 .preferences-aside-content {

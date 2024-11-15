@@ -52,7 +52,7 @@
 }
 
 .configure-btn {
-    padding: 8px 16px 8px 16px;
+    padding: 5px 30px 5px 30px;
     box-shadow: 0px 0px 44px 0px var(--button-shadow);
     width: fit-content;
 }
@@ -66,10 +66,11 @@
 }
 
 .name-service-selector {
-    background: var(--preferences-highlighted-color);
+    background-color: var(--text-primary-color);
     font-size: 14px;
     padding: 0.3rem;
-    font-weight: 500;
+    font-weight: bold;
+    color: #0D0D0D;
     outline: none;
 }
 
@@ -81,6 +82,97 @@ input::placeholder {
     font-size: 11px;
 }
 
+.dm3-address {
+    word-break: break-word;
+}
+
+.address-tooltip{
+    background: var(--normal-btn-hover);
+    color: var(--text-primary-color);
+    margin-left: 0.6rem;
+    padding: 2px 7px 2px 7px;
+    border-radius: 13px;
+    font-size: 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+.address-tooltip-text{
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    width: 300px;
+    border-radius: 6px;
+    padding: 6px 6px 6px 6px;
+    margin: 22px 9px 10px 0px;
+    background-color: var(--text-secondary-color);
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1rem;
+    cursor: text;
+}
+
+.address-tooltip:hover .address-tooltip-text {
+    visibility: visible;
+}
+
+.add-prof-btn-disabled {
+    background: var(--normal-btn-inactive);
+    color: var(--disabled-btn-text);
+    border: none;
+}
+
+.add-prof-btn-active {
+    background-color: var(--normal-btn-hover);
+    border: var(--normal-btn-border);
+    color: var(--text-primary-color);
+}
+
+.dm3-prof-select-container{
+    border: 1px solid var(--text-primary-color);
+    border-radius: 5px;
+}
+
+.dm3-prof-select-type{
+    background: var(--configure-profile-modal-background-color);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    line-height: 24px;
+    border-radius: 5px;
+    color: black;
+}
+
+.name-option{
+    color: var(--text-primary-color);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 24px;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.prof-option-container{
+    padding: 3rem 1rem 1rem 1rem;
+}
+
+.update-btn {
+    margin-left: 1.2rem !important;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+  .ens-components-container{
+    padding: 1.25rem;
+  }
+
+  .config-profile-cancel-btn {
+    background-color: transparent;
+    border: 2px solid var(--preferences-highlighted-color);
+    color: var(--text-primary-color);
+}
+
 /* =================== Mobile Responsive CSS =================== */
 
 @media only screen and (min-width: 800px) and (max-width: 1150px) {
@@ -90,12 +182,32 @@ input::placeholder {
     .conversation-error {
         font-size: 0.7rem !important;
     }
+    .ens-components-container{
+        padding: 1rem;
+    }
+    .profile-action-btns {
+        margin-top: 1rem !important;
+    }
+    .dm3-name-container {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 950px) {
+    #ens-name{
+        width: 90% !important;
+    }
 }
 
 @media only screen and (max-width: 800px) {
     .profile-input {
         padding: 0.2rem 0.5rem 0.2rem 0.5rem;
         width: 100%;
+        font-size: 12px;
+    }
+
+    .profile-input::placeholder{
+        font-size: 10px !important;
     }
 
     .dm3-name-container {
@@ -114,7 +226,7 @@ input::placeholder {
     }
 
     .configure-btn {
-        padding: 6px 14px 4px 14px;
+        padding: 4px 14px 4px 14px;
     }
 
     .dm3-name-content {
@@ -134,5 +246,52 @@ input::placeholder {
 
     .name-service-selector{
         font-size: 12px;
+        width: 100%;
     }
+
+    .dm3-address {
+        word-break: break-word;
+        font-size: 13px !important;
+    }
+
+    .address-tooltip-text{
+        margin: 22px 0px 10px -83px !important;
+    }
+
+    .prof-option-container{
+        padding: 1rem 1rem 1rem 0rem;
+    }
+
+    .name-select-container{
+        margin-left: -11px;
+    }
+
+    .dm3-prof-select-type{
+        font-size: 12px;
+    }
+
+    .title-content {
+        font-size: 12px;
+    }
+
+    .ens-components-container{
+        padding: 0.5rem;
+    }
+
+    .update-btn {
+        margin-top: 1rem;
+        margin-left: 0rem !important;
+        font-size: 12px;
+        border-radius: 6px;
+        width: fit-content;
+    }
+
+    .del-icon{
+        height: 1rem;
+    }
+
+    .profile-input{
+        width: 100% !important;
+    }
+
 }

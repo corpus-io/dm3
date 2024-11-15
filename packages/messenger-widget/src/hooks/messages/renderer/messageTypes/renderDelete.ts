@@ -24,7 +24,7 @@ export const renderDelete = (messages: MessageModel[]) => {
         .map((message) => {
             if (
                 toBeDeletedByMessageHash.includes(
-                    message.envelop.metadata?.encryptedMessageHash,
+                    message.envelop.metadata?.messageHash,
                 )
             ) {
                 return {

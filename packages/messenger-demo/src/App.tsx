@@ -50,6 +50,7 @@ function App() {
         theme: undefined, // OPTIONAL PARAMETER : undefined/themeColors
         signInImage: undefined, // OPTIONAL PARAMETER : string URL of image
         siwe: undefined, // OPTIONAL PARAMETER : sign in with ethereum
+        disableDialogOptions: undefined, // OPTIONAL PARAMETER : to enable/disable dialog properties
     };
 
     return (

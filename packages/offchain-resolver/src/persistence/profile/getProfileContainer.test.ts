@@ -1,6 +1,6 @@
 import { SignedUserProfile } from '@dm3-org/dm3-lib-profile';
 import { ethers } from 'ethers';
-import winston from 'winston';
+
 import { getProfileContainer, setUserProfile } from '.';
 import { IDatabase } from '../IDatabase';
 import { getDatabase, getDbClient } from '../getDatabase';

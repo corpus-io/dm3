@@ -1,10 +1,10 @@
 import { Redis, IDatabase, getRedisClient, getDatabase } from '../getDatabase';
 import { UserProfile } from '@dm3-org/dm3-lib-profile';
-import { Session } from '@dm3-org/dm3-lib-delivery';
+import { Account } from '@dm3-org/dm3-lib-delivery';
 
 const USER_ADDRESS = '0x25A643B6e52864d0eD816F1E43c0CF49C83B8292';
 
-describe('Set Session', () => {
+describe('Set Account', () => {
     let redisClient: Redis;
     let db: IDatabase;
 
@@ -19,13 +19,13 @@ describe('Set Session', () => {
         await redisClient.disconnect();
     });
 
-    it('Creates a new Session ', async () => {
+    it('Creates a new Account ', async () => {
         const profile: UserProfile = {
             publicEncryptionKey: '',
             publicSigningKey: '',
             deliveryServices: [],
         };
-        const session: Session = {
+        const account: Account = {
             account: USER_ADDRESS,
             signedUserProfile: { profile, signature: 'foo' },
             token: '',
@@ -35,25 +35,25 @@ describe('Set Session', () => {
             },
         };
 
-        const priorSetSession = await db.getAccount(USER_ADDRESS);
-        //User has no session yet
-        expect(priorSetSession).toBe(null);
-        await db.setAccount(USER_ADDRESS, session);
+        const priorSetAccount = await db.getAccount(USER_ADDRESS);
+        //User has no account yet
+        expect(priorSetAccount).toBe(null);
+        await db.setAccount(USER_ADDRESS, account);
 
-        const afterSetSession = await db.getAccount(USER_ADDRESS);
-        //User has no session yet
-        expect(afterSetSession?.signedUserProfile).toEqual({
+        const afterSetAccount = await db.getAccount(USER_ADDRESS);
+        //User has no account yet
+        expect(afterSetAccount?.signedUserProfile).toEqual({
             profile,
             signature: 'foo',
         });
     });
-    it('Creates a new Session and uses normalized address', async () => {
+    it('Creates a new Account and uses normalized address', async () => {
         const profile: UserProfile = {
             publicEncryptionKey: '',
             publicSigningKey: '',
             deliveryServices: [],
         };
-        const session: Session = {
+        const account: Account = {
             // Address is not normalized
             account: USER_ADDRESS.toUpperCase(),
             signedUserProfile: { profile, signature: 'foo' },
@@ -64,26 +64,26 @@ describe('Set Session', () => {
             },
         };
 
-        const priorSetSession = await db.getAccount(USER_ADDRESS);
-        //User has no session yet
-        expect(priorSetSession).toBe(null);
-        await db.setAccount(USER_ADDRESS, session);
+        const priorSetAccount = await db.getAccount(USER_ADDRESS);
+        //User has no account yet
+        expect(priorSetAccount).toBe(null);
+        await db.setAccount(USER_ADDRESS, account);
 
-        const afterSetSession = await db.getAccount(USER_ADDRESS);
-        //User has no session yet
-        expect(afterSetSession?.signedUserProfile).toEqual({
+        const afterSetAccount = await db.getAccount(USER_ADDRESS);
+        //User has no account yet
+        expect(afterSetAccount?.signedUserProfile).toEqual({
             profile,
             signature: 'foo',
         });
     });
 
-    it('Rejects session with an invalid address', async () => {
+    it('Rejects account with an invalid address', async () => {
         const profile: UserProfile = {
             publicEncryptionKey: '',
             publicSigningKey: '',
             deliveryServices: [],
         };
-        const session: Session = {
+        const account: Account = {
             account: USER_ADDRESS,
             signedUserProfile: {
                 profile,
@@ -96,20 +96,20 @@ describe('Set Session', () => {
             },
         };
         try {
-            await db.setAccount('foo', session);
+            await db.setAccount('foo', account);
             fail();
         } catch (e) {
             expect(e).toStrictEqual(Error('Invalid address'));
         }
     });
 
-    it('Rejects session with an invalid schema', async () => {
-        const invalidSession = {} as Session;
+    it('Rejects account with an invalid schema', async () => {
+        const invalidAccount = {} as Account;
         try {
-            await db.setAccount('foo', invalidSession);
+            await db.setAccount('foo', invalidAccount);
             fail();
         } catch (e) {
-            expect(e).toStrictEqual(Error('Invalid session'));
+            expect(e).toStrictEqual(Error('Invalid account'));
         }
     });
 });

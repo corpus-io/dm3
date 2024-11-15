@@ -10,8 +10,12 @@ export default function ConfigureProfileBox() {
     const { displayName } = useContext(AuthContext);
     const { selectedContact } = useContext(ConversationContext);
     const { dm3Configuration } = useContext(DM3ConfigurationContext);
-    const { setShowProfileConfigurationModal, setShowPreferencesModal } =
-        useContext(ModalContext);
+    const {
+        setShowProfileConfigurationModal,
+        setShowPreferencesModal,
+        isProfileDialogDisabled,
+        updatePreferenceSelected,
+    } = useContext(ModalContext);
 
     const [showConfigBox, setShowConfigBox] = useState<boolean>(false);
 
@@ -25,7 +29,7 @@ export default function ConfigureProfileBox() {
         setShowConfigBox(!displayName || isAddrEnsName ? true : false);
     }, [displayName]);
 
-    return showConfigBox ? (
+    return showConfigBox && !isProfileDialogDisabled() ? (
         <div
             data-testid="config-profile-box"
             className={'config-box-main width-fill background-container'.concat(
@@ -51,6 +55,7 @@ export default function ConfigureProfileBox() {
                             openConfigurationModal(
                                 setShowProfileConfigurationModal,
                                 setShowPreferencesModal,
+                                updatePreferenceSelected,
                             )
                         }
                     >

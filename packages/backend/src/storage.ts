@@ -1,5 +1,5 @@
 import { normalizeEnsName } from '@dm3-org/dm3-lib-profile';
-import { authorize } from '@dm3-org/dm3-lib-server-side';
+import { authorizationMiddleware } from '@dm3-org/dm3-lib-server-side';
 import { sha256, validateSchema } from '@dm3-org/dm3-lib-shared';
 import cors from 'cors';
 import { ethers } from 'ethers';
@@ -32,7 +32,7 @@ export default (
             next: NextFunction,
             ensName: string,
         ) => {
-            authorize(
+            authorizationMiddleware(
                 req,
                 res,
                 next,

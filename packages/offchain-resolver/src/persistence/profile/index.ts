@@ -1,5 +1,3 @@
-import winston from 'winston';
-
 export { getProfileContainer } from './getProfileContainer';
 export { getProfileContainerByAddress } from './getProfileContainerByAddress';
 export { removeUserProfile } from './removeUserProfile';

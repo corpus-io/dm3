@@ -16,7 +16,7 @@ export const renderReactions = (messages: MessageModel[]) => {
                     .filter(
                         (reaction) =>
                             reaction.message.metadata.referenceMessageHash ===
-                            message.envelop.metadata?.encryptedMessageHash,
+                            message.envelop.metadata?.messageHash,
                     )
                     //Filter duplicates, we only want to display a reaction once
                     //I.e if there are ten messages from type ❤️ we only want to display one ❤️

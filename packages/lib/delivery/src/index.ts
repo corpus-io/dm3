@@ -9,7 +9,7 @@ export { getConversationId } from './Messages';
 export type {} from './PublicMessages';
 export * as schema from './schema';
 export * as spamFilter from './spam-filter/';
-export type { Session } from './Session';
+export type { Account } from './Account';
 export type { DeliveryServiceProperties } from './Delivery';
 export * from './notifications';
 export {

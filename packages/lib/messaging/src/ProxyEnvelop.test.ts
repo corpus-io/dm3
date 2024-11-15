@@ -118,13 +118,13 @@ describe('ProxyEnvelope', () => {
             delete proxyEnvelop.encryptionEnvelops[0].encryptionEnvelop.metadata
                 .signature;
             delete proxyEnvelop.encryptionEnvelops[0].encryptionEnvelop.metadata
-                .encryptedMessageHash;
+                .messageHash;
             delete proxyEnvelop.encryptionEnvelops[1].encryptionEnvelop.metadata
                 .deliveryInformation;
             delete proxyEnvelop.encryptionEnvelops[1].encryptionEnvelop.metadata
                 .signature;
             delete proxyEnvelop.encryptionEnvelops[1].encryptionEnvelop.metadata
-                .encryptedMessageHash;
+                .messageHash;
 
             expect(proxyEnvelop).toStrictEqual({
                 encryptionEnvelops: [

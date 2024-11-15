@@ -147,8 +147,7 @@ export const handleMessagesFromDeliveryService = async (
                     //Here we use the TLD name because the delivery service uses the TLD name to identify the contact
                     //We cannot just use teh messageId because redis prevents us from finding messages by ID
                     contactAddress: conversation.tldName,
-                    messageHash:
-                        message.envelop.metadata?.encryptedMessageHash!,
+                    messageHash: message.envelop.metadata?.messageHash!,
                 }),
             );
             //sync acknowledgements with the delivery serviceƒƒ

@@ -89,7 +89,8 @@ Follow the below given steps :-
             showContacts: true,
             theme: undefined, 
             signInImage: undefined,
-            siwe: undefined
+            siwe: undefined,
+            disableDialogOptions: undefined,
         };
 
         return (
@@ -211,7 +212,7 @@ Follow the below given steps :-
          REACT_APP_WALLET_CONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
          REACT_APP_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID,
          REACT_APP_MAINNET_PROVIDER_RPC: process.env.NEXT_PUBLIC_MAINNET_PROVIDER_RPC,
-         REACT_APP_PUBLIC_VAPID_KEY: process.env.NEXT_PUBLIC_PUBLIC_VAPID_KEY
+         REACT_APP_PUBLIC_VAPID_KEY: process.env.NEXT_PUBLIC_PUBLIC_VAPID_KEY,
          REACT_APP_NONCE: process.env.NEXT_PUBLIC_NONCE,
       },
    };
@@ -246,6 +247,7 @@ Follow the below given steps :-
             theme: undefined, 
             signInImage: undefined,
             siwe: undefined,
+            disableDialogOptions: undefined,
         };
 
         return (
@@ -282,7 +284,7 @@ yarn run dev
 1. Create a new vite app with typescript.
 2. Follow all the steps similar to React.js integration.
 3. Don't create .env file instead use the below configuration.
-4. Add the following properties in vite.config.ts file 
+4. Add the following properties in vite.config.ts file. 
 
    #### For Sepolia testnet :
 
@@ -426,10 +428,15 @@ Example :
 ```js
 const props: DM3Configuration = {
    ...
-   siwe: "https://myimage.png",
+   siwe: {
+        address: "0xe7861D923e1B055bB25CD49569d20903c44692c5",
+        message: "my msg",
+        signature: '0xc9c8df80009a302559642d67adeea12d6e3f2ecbd7702986596b4012a5f5956e70c2a2c658f7c02e9255499049ea518fdf714cadc121b0319aee80f7ae28b0181b',
+        secret: "my-super-secret0"
+    },
 }
 ```
-This is a optional property of type obejct. Using this one can signin into DM3 with the SIWE (Sign In With Ethereum). All the properties of the object are mandatory.
+This is a optional property of type object. Using this one can signin into DM3 with the SIWE (Sign In With Ethereum). All the properties of the object are mandatory.
 
 
 #### Address : 
@@ -444,8 +451,8 @@ IMPORTANT The embedding app is responsible for security, recovery, etc.
 
 ```js
 Example : 
-   signInImage: undefined
-   signInImage: {
+   siwe: undefined
+   siwe: {
         address: "0xe7861D923e1B055bB25CD49569d20903c44692c5",
         message: "my msg",
         signature: '0xc9c8df80009a302559642d67adeea12d6e3f2ecbd7702986596b4012a5f5956e70c2a2c658f7c02e9255499049ea518fdf714cadc121b0319aee80f7ae28b0181b',
@@ -453,11 +460,52 @@ Example :
     }
 ```
 
-7. theme
+7. disableDialogOptions
 ```js
 const props: DM3Configuration = {
    ...
-   theme: undefined,
+   disableDialogOptions: true,
+}
+```
+This is a optional property of type DisableDialogType. To disable all the properties of dialog set it true. By default all properties are active. All the properties of each category is optional.
+```js
+Example : 
+   disableDialogOptions: true
+   disableDialogOptions: false
+   disableDialogOptions: undefined
+   disableDialogOptions: {
+      network: true,
+      notification: {
+         email: true,
+         push: false,
+      },
+      profile: {
+         dm3: {
+            cloud: false,
+            optimism: true,
+         },
+         self: {
+            gnosis: true,
+            ens: false,
+         }
+      },
+      settings: {
+         messageView: true,
+      }
+   }
+   disableDialogOptions: {
+      notification: {
+         email: true,
+         push: false,
+      },
+   }
+```
+
+8. theme
+```js
+const props: DM3Configuration = {
+   ...
+   theme: undefined, 
 }
 ```
 This is a optional property of type object. Its used to customize the styling, look & feel of the widget. Colors can be set for different components.
@@ -511,6 +559,7 @@ Example :
       alternateContactBackgroundColor: 'black',
       menuBackgroundColor: 'blue',
       preferencesHighlightedColor: '#8b7ff4',
+      configureProfileModalBackgroundColor: '#D9D9D9',
    }
 ```
 

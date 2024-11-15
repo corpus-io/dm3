@@ -4,7 +4,7 @@ import { SpamFilterRules } from './spam-filter';
 //1Year
 const TTL = 31536000000;
 
-export interface Session {
+export interface Account {
     account: string;
     signedUserProfile: SignedUserProfile;
     token: string;

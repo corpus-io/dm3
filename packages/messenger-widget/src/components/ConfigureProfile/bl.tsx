@@ -10,6 +10,7 @@ import { ConfigureCloudNameProfile } from './dm3Names/cloudName/ConfigureCloudNa
 import { ConfigureOptimismNameProfile } from './dm3Names/optimismName/ConfigureOptimismNameProfile';
 import { supportedChains } from '../../utils/common-utils';
 import { removeAlias } from '../../adapters/offchainResolverApi';
+import { PREFERENCES_ITEMS } from '../Preferences/bl';
 
 export const PROFILE_INPUT_FIELD_CLASS =
     'profile-input font-weight-400 font-size-14 border-radius-6 w-100 line-height-24';
@@ -26,9 +27,11 @@ export enum ACTION_TYPE {
 export const openConfigurationModal = (
     setShowProfileConfigurationModal: (show: boolean) => void,
     setShowPreferencesModal: (show: boolean) => void,
+    updatePreferenceSelected: (ticker: PREFERENCES_ITEMS | null) => void,
 ) => {
     setShowProfileConfigurationModal(true);
     setShowPreferencesModal(true);
+    updatePreferenceSelected(PREFERENCES_ITEMS.DM3_PROFILE);
 };
 
 // method to close the profile configuration modal
@@ -151,7 +154,7 @@ export const fetchExistingDM3Name = async (
     }
 };
 
-const enum NAME_SERVICES {
+export const enum NAME_SERVICES {
     ENS = 'Ethereum Network - Ethereum Name Service (ENS)',
     GENOME = 'Gnosis Network - Genome/SpaceID',
     OPTIMISM = 'Optimism Network',
@@ -160,10 +163,12 @@ const enum NAME_SERVICES {
 export const namingServices = [
     {
         name: NAME_SERVICES.ENS,
+        key: 'ens',
         chainId: supportedChains.ethereumMainnet,
     },
     {
         name: NAME_SERVICES.GENOME,
+        key: 'gnosis',
         chainId: supportedChains.gnosisMainnet,
     },
 ];
@@ -220,9 +225,11 @@ export const enum DM3_NAME_SERVICES {
 export const dm3NamingServices = [
     {
         name: DM3_NAME_SERVICES.CLOUD,
+        key: 'dm3',
     },
     {
         name: DM3_NAME_SERVICES.OPTIMISM,
+        key: 'optimism',
     },
 ];
 

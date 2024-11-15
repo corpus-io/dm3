@@ -50,7 +50,7 @@ export class MessageProcessor {
      * In order to be considered valid a incoming message has to meet the following criterias
      * 1. The message size must be lower than the sizeLimit specified by the deliveryService {@see messageIsToLarge}
      * 2. The DeliveryServiceToken used by the sender has to be valid
-     * 3. The receiver has to have a session at the deliveryService
+     * 3. The receiver has to have a account at the deliveryService
      * 4. The message must pass every {@see SpamFilterRule} the receiver declared
      */
     public async processEnvelop(envelop: EncryptionEnvelop): Promise<void> {
@@ -107,18 +107,18 @@ export class MessageProcessor {
         );
         console.debug(conversationId, deliveryInformation);
 
-        //Retrieves the session of the receiver
-        const receiverSession = await this.db.getAccount(receiverAddress);
-        if (!receiverSession) {
+        //Retrieves the account of the receiver
+        const receiverAccount = await this.db.getAccount(receiverAddress);
+        if (!receiverAccount) {
             console.debug('unknown user ', deliveryInformation.to);
-            throw Error('unknown session');
+            throw Error('unknown account');
         }
 
         //Checks if the message is spam
         if (
             await spamFilter.isSpam(
                 this.provider,
-                receiverSession,
+                receiverAccount,
                 deliveryInformation,
             )
         ) {
@@ -129,7 +129,7 @@ export class MessageProcessor {
         }
 
         const receiverEncryptionKey =
-            receiverSession.signedUserProfile.profile.publicEncryptionKey;
+            receiverAccount.signedUserProfile.profile.publicEncryptionKey;
 
         const envelopWithPostmark: EncryptionEnvelop = {
             ...envelop,
@@ -158,11 +158,11 @@ export class MessageProcessor {
             //Client is already connect to the delivery service and the message can be dispatched
             //TODO MOVE send method to the WebSocketManager
             this.onSubmitMessage(
-                receiverSession.socketId!,
+                receiverAccount.socketId!,
                 envelopWithPostmark,
             );
 
-            console.debug('WS send to socketId ', receiverSession.socketId);
+            console.debug('WS send to socketId ', receiverAccount.socketId);
             //If not we're notifing the user that there is a new message waiting for them
         } else {
             try {
@@ -174,6 +174,7 @@ export class MessageProcessor {
                     deliveryInformation,
                     this.db.getUsersNotificationChannels,
                 );
+                await this.db.countNotification(this.deliveryServiceProperties);
             } catch (err) {
                 console.log(
                     'Unable to send Notification. There might be an error in the config.yml. Message has been received regardless',

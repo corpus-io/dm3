@@ -54,38 +54,38 @@ export class WebSocketManager implements IWebSocketManager {
      */
     private async addConnection(connection: Socket) {
         try {
-            const { account, token } = connection.handshake.auth;
+            const { account: accountInfo, token } = connection.handshake.auth;
 
-            const ensName = normalizeEnsName(account.ensName);
+            const ensName = normalizeEnsName(accountInfo.ensName);
             //Use the already existing function checkToken to check whether the token matches the provided ensName
-            const hasSession = await checkToken(
+            const hasAccount = await checkToken(
                 this.web3Provider,
                 this.db.hasAccount,
                 ensName,
                 token,
                 this.serverSecret,
             );
-            //retrieve the session from the db
-            const session = await this.db.getAccount(ensName);
-            //If the ensName has not a valid session we disconnect the socket
-            if (!hasSession || !session) {
+            //retrieve the account from the db
+            const account = await this.db.getAccount(ensName);
+            //If the ensName has not a valid account we disconnect the socket
+            if (!hasAccount || !account) {
                 console.log('connection refused for ', ensName);
                 connection.emit(UNAUTHORIZED);
                 connection.disconnect();
                 return;
             }
             //Get the old connections and add the new one
-            const oldConnections = this.connections.get(session.account) || [];
-            this.connections.set(session.account, [
+            const oldConnections = this.connections.get(account.account) || [];
+            this.connections.set(account.account, [
                 ...oldConnections,
                 connection,
             ]);
             //Send the authorized event
             connection.emit(AUTHORIZED);
-            console.log('connection established for ', session.account);
+            console.log('connection established for ', account.account);
             //When the socket disconnects we want them no longer in our connections List
             connection.on('disconnect', () => {
-                console.log('connection closed for ', session.account);
+                console.log('connection closed for ', account.account);
                 this.removeConnection(connection);
             });
         } catch (e) {

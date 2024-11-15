@@ -1,4 +1,4 @@
-import { Session } from '@dm3-org/dm3-lib-delivery';
+import { Account } from '@dm3-org/dm3-lib-delivery';
 import { generateAuthJWT } from '@dm3-org/dm3-lib-server-side';
 import {
     UserProfile,
@@ -28,16 +28,16 @@ const setUpApp = async (
 };
 
 const createDbMock = async () => {
-    const sessionMocked = {
+    const accountMocked = {
         challenge: '123',
         token: 'deprecated token that is not used anymore',
         signedUserProfile: {},
-    } as Session;
+    } as Account;
 
     const dbMock = {
         getAccount: async (ensName: string) =>
-            Promise.resolve<Session>(sessionMocked), // returns some valid session
-        setAccount: async (_: string, __: Session) => {},
+            Promise.resolve<Account>(accountMocked), // returns some valid account
+        setAccount: async (_: string, __: Account) => {},
         getIdEnsName: async (ensName: string) => ensName,
     };
 

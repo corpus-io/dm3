@@ -16,13 +16,9 @@ import bodyParser from 'body-parser';
 import { ethers } from 'ethers';
 import express from 'express';
 import request from 'supertest';
-import winston from 'winston';
+
 import RpcProxy from './rpc-proxy';
 import { EncryptionEnvelop } from '@dm3-org/dm3-lib-messaging';
-
-global.logger = winston.createLogger({
-    transports: [new winston.transports.Console()],
-});
 
 const mockWsManager: IWebSocketManager = {
     isConnected: function (ensName: string): Promise<boolean> {
@@ -65,7 +61,7 @@ describe('rpc-Proxy', () => {
         const isReceiver =
             ethersHelper.formatAddress(address) === receiver.address;
 
-        const session = (
+        const account = (
             account: string,
             token: string,
             profile: UserProfile,
@@ -79,11 +75,11 @@ describe('rpc-Proxy', () => {
         });
 
         if (isSender) {
-            return session(sender.address, '123', emptyProfile);
+            return account(sender.address, '123', emptyProfile);
         }
 
         if (isReceiver) {
-            return session(RECEIVER_NAME, 'abc', {
+            return account(RECEIVER_NAME, 'abc', {
                 ...emptyProfile,
                 publicEncryptionKey:
                     receiver.profileKeys.encryptionKeyPair.publicKey,
@@ -158,6 +154,7 @@ describe('rpc-Proxy', () => {
                 getAccount,
                 getIdEnsName: async (ensName: string) => ensName,
                 getUsersNotificationChannels: () => Promise.resolve([]),
+                countMessage: () => {},
             };
             const io = {
                 sockets: {
@@ -231,6 +228,7 @@ describe('rpc-Proxy', () => {
                 getAccount,
                 getIdEnsName: async (ensName: string) => ensName,
                 getUsersNotificationChannels: () => Promise.resolve([]),
+                countMessage: () => {},
             };
             const io = {
                 sockets: {

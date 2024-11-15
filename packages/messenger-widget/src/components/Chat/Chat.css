@@ -57,6 +57,10 @@
     height: auto;
 }
 
+.infinite-scroll-component{
+    overflow: visible !important;
+}
+
 /* =================== Mobile Responsive CSS =================== */
 
 @media only screen and (max-width: 800px) {

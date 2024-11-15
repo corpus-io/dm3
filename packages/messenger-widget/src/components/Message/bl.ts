@@ -47,8 +47,11 @@ export const getFilesAttachments = (files: Attachment[]) => {
 export const getMessageStyleClasses = (
     props: MessageProps,
     messageView: MessageAction,
+    isOldMsgStyle: boolean,
 ): string => {
     return 'width-fill text-left border-radius-6 content-style'.concat(
+        ' ',
+        isOldMsgStyle ? 'old-content-style' : '',
         ' ',
         (props.ownMessage
             ? !props.message &&
@@ -61,7 +64,7 @@ export const getMessageStyleClasses = (
                   messageView.messageData?.envelop.message.signature ===
                       props.envelop.message.signature
                 ? 'msg-editing-active'
-                : 'ms-3 own-msg-background own-msg-text'
+                : 'own-msg-background own-msg-text'
             : !props.message &&
               props.envelop.message.metadata.type ===
                   MessageActionType.DELETE &&
@@ -74,6 +77,8 @@ export const getMessageStyleClasses = (
             props.reactions.length > 0
                 ? props.ownMessage
                     ? 'own-reacted-msg'
+                    : isOldMsgStyle
+                    ? 'old-contact-reacted-msg'
                     : 'contact-reacted-msg'
                 : '',
         ),
@@ -81,13 +86,18 @@ export const getMessageStyleClasses = (
 };
 
 // returns the css classes based on the reactions
-export const getMessageReactionStyleClassses = (props: MessageProps) => {
+export const getMessageReactionStyleClassses = (
+    props: MessageProps,
+    isOldMsgType: boolean,
+) => {
     return 'd-flex justify-content-end text-secondary-color time-style'.concat(
         ' ',
         props.reactions.length > 0
-            ? !props.ownMessage
-                ? 'justify-content-between'
-                : 'ms-3 justify-content-end'
+            ? isOldMsgType
+                ? !props.ownMessage
+                    ? 'justify-content-between'
+                    : 'ms-3 justify-content-end'
+                : ''
             : props.ownMessage
             ? 'ms-3'
             : '',

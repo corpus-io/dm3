@@ -3,13 +3,8 @@ import {
     NotificationChannelType,
 } from '@dm3-org/dm3-lib-shared';
 import { IDatabase, Redis, getDatabase, getRedisClient } from '../getDatabase';
-import winston from 'winston';
 
 const USER_ADDRESS = '0x25A643B6e52864d0eD816F1E43c0CF49C83B8292';
-
-global.logger = winston.createLogger({
-    transports: [new winston.transports.Console()],
-});
 
 describe('Set Users NotificationChannel', () => {
     let redisClient: Redis;
@@ -37,14 +32,14 @@ describe('Set Users NotificationChannel', () => {
         const priorSetUsersNotificationChannel =
             await db.getUsersNotificationChannels(USER_ADDRESS);
 
-        //User has no session yet
+        //User has no account yet
         expect(priorSetUsersNotificationChannel).toEqual([]);
         await db.addUsersNotificationChannel(USER_ADDRESS, notificationChannel);
 
-        const afterSetSession = await db.getUsersNotificationChannels(
+        const afterSetAccount = await db.getUsersNotificationChannels(
             USER_ADDRESS,
         );
-        expect(afterSetSession).toEqual([notificationChannel]);
+        expect(afterSetAccount).toEqual([notificationChannel]);
     });
 
     it('Rejects Notification Channel with an invalid schema', async () => {
@@ -121,14 +116,14 @@ describe('Set Users NotificationChannel', () => {
         const priorSetUsersNotificationChannel =
             await db.getUsersNotificationChannels(USER_ADDRESS);
 
-        //User has no session yet
+        //User has no account yet
         expect(priorSetUsersNotificationChannel).toEqual([]);
         await db.addUsersNotificationChannel(USER_ADDRESS, notificationChannel);
 
-        const afterSetSession = await db.getUsersNotificationChannels(
+        const afterSetAccount = await db.getUsersNotificationChannels(
             USER_ADDRESS,
         );
-        expect(afterSetSession).toEqual([notificationChannel]);
+        expect(afterSetAccount).toEqual([notificationChannel]);
     });
 
     it('Rejects Push Notification Channel with an invalid schema', async () => {

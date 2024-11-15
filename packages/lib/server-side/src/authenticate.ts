@@ -34,7 +34,7 @@ const createNewSessionTokenBodySchema = {
     additionalProperties: false,
 };
 
-export const Auth = (
+export const Authenticate = (
     db: IAccountDatabase,
     serverSecret: string,
     web3Provider: ethers.providers.JsonRpcProvider,

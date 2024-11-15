@@ -1,6 +1,6 @@
 {
   "name": "@dm3-org/dm3-lib-test-helper",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "main": "dist/index.js",
   "module": "dist-backend/index.js",
   "types": "dist/index.d.ts",

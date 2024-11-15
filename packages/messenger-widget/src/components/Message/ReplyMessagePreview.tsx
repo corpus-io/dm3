@@ -16,8 +16,7 @@ export function ReplyMessagePreview(props: MessageProps) {
                 )}
                 onClick={() =>
                     scrollToMessage(
-                        props.replyToMessageEnvelop?.metadata
-                            ?.encryptedMessageHash!,
+                        props.replyToMessageEnvelop?.metadata?.messageHash!,
                     )
                 }
             >

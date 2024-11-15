@@ -16,6 +16,7 @@ import { DM3Configuration } from '../../interfaces/config';
 import { ContactPreview, getEmptyContact } from '../../interfaces/utils';
 import { useMainnetProvider } from '../mainnetprovider/useMainnetProvider';
 import { hydrateContract } from './hydrateContact';
+import { ethers } from 'ethers';
 
 const DEFAULT_CONVERSATION_PAGE_SIZE = 10;
 
@@ -224,13 +225,21 @@ export const useConversation = (config: DM3Configuration) => {
         const contactTldName = normalizeEnsName(_ensName);
         //rrsolves the TLD name. That name becomes the identifier for the conversation
         const aliasName = await resolveTLDtoAlias(contactTldName);
+
+        const defaultProfileLocation = ethers.utils.isAddress(contactTldName)
+            ? normalizeEnsName(
+                  contactTldName + dm3Configuration.addressEnsSubdomain,
+              )
+            : contactTldName;
+
         const newConversation: Conversation = {
             contactEnsName: aliasName,
-            contactProfileLocation: [contactTldName], //(ID)
+            contactProfileLocation: [defaultProfileLocation], //(ID)
             isHidden: false,
             previewMessage: undefined,
             updatedAt: new Date().getTime(),
         };
+
         //Adds the conversation to the conversation state
         const conversationPreview = _addConversation(newConversation);
         //Add the contact to the storage in the background

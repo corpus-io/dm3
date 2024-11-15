@@ -5,7 +5,7 @@ const serverSecret = 'veryImportantSecretToGenerateAndValidateJSONWebTokens';
 // create valid jwt
 const token = generateAuthJWT('alice.eth', serverSecret);
 
-describe('Session', () => {
+describe('Account', () => {
     describe('checkToken with state', () => {
         it('Should return true if the jwt is valid', async () => {
             const hasAccount = (_: string) => Promise.resolve(true);
@@ -24,7 +24,7 @@ describe('Session', () => {
             expect(isValid).toBe(true);
         });
 
-        it('Should return false if no session exists for the account ', async () => {
+        it('Should return false if no account exists for the account ', async () => {
             const hasAccount = (_: string) => Promise.resolve(false);
 
             const isValid = await checkToken(
@@ -59,7 +59,7 @@ describe('Session', () => {
             expect(isValid).toBe(false);
         });
 
-        it('Should return false if a session exists but the token is expired ', async () => {
+        it('Should return false if a account exists but the token is expired ', async () => {
             const hasAccount = (_: string) => Promise.resolve(true);
 
             const oneMinuteAgo = new Date().getTime() / 1000 - 60;

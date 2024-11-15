@@ -1,4 +1,9 @@
-import { IGlobalNotification, IOtp, Session } from '@dm3-org/dm3-lib-delivery';
+import {
+    DeliveryServiceProperties,
+    IGlobalNotification,
+    IOtp,
+    type Account as AccountType,
+} from '@dm3-org/dm3-lib-delivery';
 import { EncryptionEnvelop } from '@dm3-org/dm3-lib-messaging';
 import { IAccountDatabase } from '@dm3-org/dm3-lib-server-side';
 import {
@@ -10,6 +15,8 @@ import Account from './account';
 import { getIdEnsName } from './getIdEnsName';
 import Messages from './messages';
 import { syncAcknowledge } from './messages/syncAcknowledge';
+import type { IntervalMetric } from './metrics';
+import Metrics from './metrics';
 import Notification from './notification';
 import Otp from './otp';
 
@@ -22,6 +29,9 @@ export enum RedisPrefix {
     NotificationChannel = 'notificationChannel:',
     GlobalNotification = 'globalNotification:',
     Otp = 'otp:',
+    MetricsMessageCount = 'metricsMessageCount:',
+    MetricsMessageSize = 'metricsMessageSize:',
+    MetricsNotificationCount = 'metricsNotificationCount:',
 }
 
 export async function getRedisClient() {
@@ -53,12 +63,8 @@ export async function getRedisClient() {
     return client;
 }
 
-export async function getDatabase(
-    _redis?: Redis,
-    // _prisma?: PrismaClient,
-): Promise<IDatabase> {
+export async function getDatabase(_redis?: Redis): Promise<IDatabase> {
     const redis = _redis ?? (await getRedisClient());
-    // const prisma = _prisma ?? (await getPrismaClient());
 
     return {
         //Messages
@@ -90,12 +96,16 @@ export async function getDatabase(
         setOtp: Otp.setOtp(redis),
         getOtp: Otp.getOtp(redis),
         resetOtp: Otp.resetOtp(redis),
+        // Metrics
+        getMetrics: Metrics.getMetrics(redis),
+        countMessage: Metrics.countMessage(redis),
+        countNotification: Metrics.countNotification(redis),
     };
 }
 
 export interface IDatabase extends IAccountDatabase {
-    setAccount: (address: string, session: Session) => Promise<void>;
-    getAccount: (address: string) => Promise<Session | null>;
+    setAccount: (address: string, account: AccountType) => Promise<void>;
+    getAccount: (address: string) => Promise<AccountType | null>;
     //TODO use address
     getIncomingMessages: (
         address: string,
@@ -155,6 +165,16 @@ export interface IDatabase extends IAccountDatabase {
     resetOtp: (
         ensName: string,
         channelType: NotificationChannelType,
+    ) => Promise<void>;
+    getMetrics: (
+        deliveryServiceProperties: DeliveryServiceProperties,
+    ) => Promise<IntervalMetric[]>;
+    countMessage: (
+        messageSizeBytes: number,
+        deliveryServiceProperties: DeliveryServiceProperties,
+    ) => Promise<void>;
+    countNotification: (
+        deliveryServiceProperties: DeliveryServiceProperties,
     ) => Promise<void>;
 }
 

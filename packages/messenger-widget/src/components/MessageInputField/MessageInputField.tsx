@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { ConversationContext } from '../../context/ConversationContext';
 import { MessageContext } from '../../context/MessageContext';
@@ -14,6 +14,7 @@ export function MessageInputField(props: MessageDataProps) {
     const { addMessage } = useContext(MessageContext);
     const { setMessageView, messageView } = useContext(UiViewContext);
     const { setLastMessageAction } = useContext(ModalContext);
+    const [isSendBtnDisabled, setIsSendBtnDisabled] = useState<boolean>(false);
 
     const resetMessageView = {
         actionType: MessageActionType.NONE,
@@ -31,6 +32,10 @@ export function MessageInputField(props: MessageDataProps) {
 
     async function submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        if (isSendBtnDisabled) {
+            return;
+        }
+        setIsSendBtnDisabled(true);
         await onSubmitMessage(
             messageView,
             setMessageView,
@@ -41,6 +46,7 @@ export function MessageInputField(props: MessageDataProps) {
             account!,
             selectedContact!,
         );
+        setIsSendBtnDisabled(false);
     }
 
     // Focus on input field when user selects a msg to EEDIT or REPLY

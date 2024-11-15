@@ -33,6 +33,7 @@ import { TLDContextProvider } from '../../context/TLDContext';
 import { UiViewContextProvider } from '../../context/UiViewContext';
 import { Dm3Props } from '../../interfaces/config';
 import './Home.css';
+import { SettingsContextProvider } from '../../context/SettingsContext';
 
 export function Home(props: Dm3Props) {
     /**
@@ -101,17 +102,19 @@ export function Home(props: Dm3Props) {
                                 >
                                     <TLDContextProvider>
                                         <AuthContextProvider>
-                                            <DeliveryServiceContextProvider>
-                                                <BackendContextProvider>
-                                                    <StorageContextProvider>
-                                                        <DM3
-                                                            config={
-                                                                props.config
-                                                            }
-                                                        />
-                                                    </StorageContextProvider>
-                                                </BackendContextProvider>
-                                            </DeliveryServiceContextProvider>
+                                            <SettingsContextProvider>
+                                                <DeliveryServiceContextProvider>
+                                                    <BackendContextProvider>
+                                                        <StorageContextProvider>
+                                                            <DM3
+                                                                config={
+                                                                    props.config
+                                                                }
+                                                            />
+                                                        </StorageContextProvider>
+                                                    </BackendContextProvider>
+                                                </DeliveryServiceContextProvider>
+                                            </SettingsContextProvider>
                                         </AuthContextProvider>
                                     </TLDContextProvider>
                                 </MainnetProviderContextProvider>

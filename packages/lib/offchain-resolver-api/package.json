@@ -1,6 +1,6 @@
 {
   "name": "@dm3-org/dm3-lib-offchain-resolver-api",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

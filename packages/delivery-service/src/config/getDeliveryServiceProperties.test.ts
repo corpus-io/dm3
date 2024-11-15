@@ -21,12 +21,16 @@ describe('ReadDeliveryServiceProperties', () => {
             messageTTL: 12345,
             sizeLimit: 456,
             notificationChannel: [],
+            metricsCollectionIntervalInSeconds: 600,
+            metricsRetentionDurationInSeconds: 172800,
         });
 
         expect(config).toStrictEqual({
             messageTTL: 12345,
             sizeLimit: 456,
             notificationChannel: [],
+            metricsCollectionIntervalInSeconds: 600,
+            metricsRetentionDurationInSeconds: 172800,
         });
     });
 
@@ -37,6 +41,8 @@ describe('ReadDeliveryServiceProperties', () => {
                 messageTTL: 12345,
                 sizeLimit: 456,
                 notificationChannel: [],
+                metricsCollectionIntervalInSeconds: 900,
+                metricsRetentionDurationInSeconds: 259200,
             }),
             { encoding: 'utf-8' },
         );
@@ -46,8 +52,11 @@ describe('ReadDeliveryServiceProperties', () => {
             messageTTL: 12345,
             sizeLimit: 456,
             notificationChannel: [],
+            metricsCollectionIntervalInSeconds: 900,
+            metricsRetentionDurationInSeconds: 259200,
         });
     });
+
     it('Adds default properties if config.yml is not fully specified', () => {
         writeFileSync(
             path,
@@ -68,6 +77,7 @@ describe('ReadDeliveryServiceProperties', () => {
                         },
                     },
                 ],
+                metricsCollectionIntervalInSeconds: 1200,
             }),
             { encoding: 'utf-8' },
         );
@@ -91,8 +101,11 @@ describe('ReadDeliveryServiceProperties', () => {
                     },
                 },
             ],
+            metricsCollectionIntervalInSeconds: 1200,
+            metricsRetentionDurationInSeconds: 60 * 60 * 24 * 10,
         });
     });
+
     it('Adds email channel from config.yml file & rest from default properties', () => {
         writeFileSync(
             path,
@@ -135,6 +148,8 @@ describe('ReadDeliveryServiceProperties', () => {
                     },
                 },
             ],
+            metricsCollectionIntervalInSeconds: 60 * 60 * 24,
+            metricsRetentionDurationInSeconds: 60 * 60 * 24 * 10,
         });
     });
 
@@ -170,6 +185,28 @@ describe('ReadDeliveryServiceProperties', () => {
                     },
                 },
             ],
+            metricsCollectionIntervalInSeconds: 60 * 60 * 24,
+            metricsRetentionDurationInSeconds: 60 * 60 * 24 * 10,
+        });
+    });
+
+    it('Uses default values for metrics properties if not specified', () => {
+        writeFileSync(
+            path,
+            stringify({
+                messageTTL: 54321,
+                sizeLimit: 789,
+            }),
+            { encoding: 'utf-8' },
+        );
+        const config = getDeliveryServiceProperties(path);
+
+        expect(config).toStrictEqual({
+            messageTTL: 54321,
+            sizeLimit: 789,
+            notificationChannel: [],
+            metricsCollectionIntervalInSeconds: 60 * 60 * 24,
+            metricsRetentionDurationInSeconds: 60 * 60 * 24 * 10,
         });
     });
 });

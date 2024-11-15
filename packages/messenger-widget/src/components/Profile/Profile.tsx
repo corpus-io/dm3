@@ -30,8 +30,11 @@ export function Profile() {
 
     const { setSelectedRightView } = useContext(UiViewContext);
 
-    const { setShowProfileConfigurationModal, setShowPreferencesModal } =
-        useContext(ModalContext);
+    const {
+        setShowProfileConfigurationModal,
+        setShowPreferencesModal,
+        updatePreferenceSelected,
+    } = useContext(ModalContext);
 
     const mainnetProvider = useMainnetProvider();
 
@@ -128,6 +131,7 @@ export function Profile() {
                                 openConfigurationModal(
                                     setShowProfileConfigurationModal,
                                     setShowPreferencesModal,
+                                    updatePreferenceSelected,
                                 )
                             }
                         />

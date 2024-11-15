@@ -19,8 +19,15 @@ export const addMessageBatch =
                 account.id,
                 encryptedContactName,
             );
+
+            const uniqueMessageBatch = messageBatch.filter(
+                (message, index, self) =>
+                    index ===
+                    self.findIndex((m) => m.messageId === message.messageId),
+            );
+
             //store each message in the db
-            const createMessagePromises = messageBatch.map(
+            const createMessagePromises = uniqueMessageBatch.map(
                 ({
                     messageId,
                     createdAt,

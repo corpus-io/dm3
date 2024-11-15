@@ -1,7 +1,6 @@
 import './Preferences.css';
-import { preferencesItems } from './bl';
 import infoIcon from './../../assets/images/preferences-info.svg';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import closeIcon from '../../assets/images/cross.svg';
 import { closeConfigurationModal } from '../ConfigureProfile/bl';
 import { ModalContext } from '../../context/ModalContext';
@@ -11,19 +10,32 @@ export function NormalView() {
         setShowPreferencesModal,
         showProfileConfigurationModal,
         setShowProfileConfigurationModal,
+        resetConfigureProfileModal,
+        preferencesOptionSelected,
+        updatePreferenceSelected,
+        preferencesOptions,
     } = useContext(ModalContext);
 
-    const [optionChoosen, setOptionChoosen] = useState<any>(null);
-
     /**
-     *  Opens DM3 profile configuration by default if user clicked
-     *  on "Configure Profile" button
+     *  Opens first option by default
      */
     useEffect(() => {
-        if (showProfileConfigurationModal) {
-            setOptionChoosen(preferencesItems[1]);
+        if (showProfileConfigurationModal && !preferencesOptionSelected) {
+            updatePreferenceSelected(
+                preferencesOptions.length ? preferencesOptions[0].ticker : null,
+            );
         }
     }, []);
+
+    // reset states of configure profile modal if any other component is loaded
+    useEffect(() => {
+        if (
+            preferencesOptionSelected &&
+            preferencesOptionSelected.name !== 'dm3 Profile'
+        ) {
+            resetConfigureProfileModal();
+        }
+    }, [preferencesOptionSelected]);
 
     return (
         <div>
@@ -45,7 +57,7 @@ export function NormalView() {
                                 <span
                                     className={'preferences-heading d-flex justify-content-center mb-0'.concat(
                                         ' ',
-                                        optionChoosen
+                                        preferencesOptionSelected
                                             ? 'preferences-text-highlighted'
                                             : 'text-primary-color',
                                     )}
@@ -55,21 +67,23 @@ export function NormalView() {
                             </div>
 
                             <hr className="preferences-separator" />
-                            {preferencesItems.map((item, index) => {
+                            {preferencesOptions.map((item, index) => {
                                 return (
                                     item.isEnabled && (
                                         <div
                                             className={'target d-flex preferences-item '.concat(
                                                 ' ',
-                                                optionChoosen &&
-                                                    optionChoosen.name ===
+                                                preferencesOptionSelected &&
+                                                    preferencesOptionSelected.name ===
                                                         item.name
                                                     ? 'normal-btn-hover'
                                                     : '',
                                             )}
                                             key={index}
                                             onClick={() =>
-                                                setOptionChoosen(item)
+                                                updatePreferenceSelected(
+                                                    item.ticker,
+                                                )
                                             }
                                         >
                                             {item.icon}
@@ -91,8 +105,9 @@ export function NormalView() {
                             </div>
                         </div>
                         <div className="col-10 m-0 p-0">
-                            {optionChoosen && optionChoosen.isEnabled ? (
-                                optionChoosen.component
+                            {preferencesOptionSelected &&
+                            preferencesOptionSelected.isEnabled ? (
+                                preferencesOptionSelected.component
                             ) : (
                                 <div className="d-flex align-items-start justify-content-end">
                                     <img
@@ -100,6 +115,7 @@ export function NormalView() {
                                         src={closeIcon}
                                         alt="close"
                                         onClick={() => {
+                                            resetConfigureProfileModal();
                                             setShowPreferencesModal(false);
                                             closeConfigurationModal(
                                                 setShowProfileConfigurationModal,

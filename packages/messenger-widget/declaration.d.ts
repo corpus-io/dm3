@@ -12,3 +12,5 @@ declare module 'localforage' {
     let localforage: LocalForage;
     export = localforage;
 }
+
+declare module '@ensdomains/ensjs';

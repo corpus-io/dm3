@@ -1,7 +1,7 @@
 {
   "name": "@dm3-org/dm3-messenger-demo",
   "license": "BSD-2-Clause",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "dependencies": {
     "@dm3-org/dm3-messenger-widget": "workspace:^",
     "@popperjs/core": "^2.11.8",

@@ -1,17 +1,16 @@
 import './RightHeader.css';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import humanIcon from '../../assets/images/human.svg';
 import menuIcon from '../../assets/images/menu.svg';
 import { AuthContext } from '../../context/AuthContext';
-import { useMainnetProvider } from '../../hooks/mainnetprovider/useMainnetProvider';
-import { getAvatarProfilePic } from '../../utils/ens-utils';
 import { RightViewSelected } from '../../utils/enum-type-utils';
 import { ConversationContext } from '../../context/ConversationContext';
 import { DM3ConfigurationContext } from '../../context/DM3ConfigurationContext';
 import { UiViewContext } from '../../context/UiViewContext';
+import { DM3UserProfileContext } from '../../context/DM3UserProfileContext';
 
 export function NormalView() {
-    const { account, displayName } = useContext(AuthContext);
+    const { displayName } = useContext(AuthContext);
 
     const { setSelectedContactName } = useContext(ConversationContext);
 
@@ -20,32 +19,13 @@ export function NormalView() {
     const { setSelectedRightView, selectedRightView } =
         useContext(UiViewContext);
 
-    const mainnetProvider = useMainnetProvider();
-
-    // state to store profile pic of signed in user
-    const [profilePic, setProfilePic] = useState<string>('');
-
-    // fetched profile pic of signed in user
-    const fetchAndSetProfilePic = async () => {
-        setProfilePic(
-            await getAvatarProfilePic(
-                mainnetProvider,
-                account?.ensName as string,
-                dm3Configuration.addressEnsSubdomain,
-            ),
-        );
-    };
+    const { accountProfilePicture } = useContext(DM3UserProfileContext);
 
     // method to set profile page and set contact
     const updateView = () => {
         setSelectedRightView(RightViewSelected.Profile);
         setSelectedContactName(undefined);
     };
-
-    // loads the profile pic on page render
-    useEffect(() => {
-        fetchAndSetProfilePic();
-    }, []);
 
     return (
         <div
@@ -82,7 +62,11 @@ export function NormalView() {
                     {displayName}
                 </span>
                 <img
-                    src={profilePic ? profilePic : humanIcon}
+                    src={
+                        accountProfilePicture
+                            ? accountProfilePicture
+                            : humanIcon
+                    }
                     alt="menu"
                     className="me-2 pointer-cursor border-radius-3 default-profile-pic"
                     onClick={() => updateView()}

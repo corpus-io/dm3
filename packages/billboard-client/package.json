@@ -1,7 +1,7 @@
 {
   "name": "@dm3-org/dm3-billboard-client",
   "license": "BSD-2-Clause",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/ined.d.ts",

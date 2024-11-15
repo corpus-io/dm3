@@ -1,0 +1,27 @@
+.settings-option-container{
+    padding: 2rem 1rem 1rem 1rem;
+}
+
+.settings-option{
+    color: var(--text-primary-color);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 24px;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.settings-msg-view{
+    padding-left: 2rem;
+}
+
+@media only screen and (max-width: 500px) {
+    .msg-view-heading{
+        font-size: 0.9rem;
+    }
+    
+    .msg-view-desc{
+        font-size: 12px;
+    }
+}

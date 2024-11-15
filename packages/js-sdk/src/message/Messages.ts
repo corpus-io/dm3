@@ -19,7 +19,7 @@ import {
 } from '@dm3-org/dm3-lib-storage';
 import { submitEnvelopsToReceiversDs } from '../api/ds/submitEnvelopsToReceiversDs';
 import { Conversations } from '../conversation/Conversations';
-import { ContactPreview } from '../conversation/types';
+import { Contact } from '../conversation/types';
 
 const DEFAULT_MESSAGE_PAGESIZE = 100;
 
@@ -78,25 +78,29 @@ export class Messages {
 
         //Find the recipient of the message in the contact list
         const recipient = this.conversations.conversations.find(
-            (c) => c.contactDetails.account.ensName === contact,
+            (c) => c.contact.account.ensName === contact,
         );
         /**
          * Check if the recipient has a PublicEncrptionKey
          * if not only keep the msg at the senders storage
          */
         const recipientIsDm3User =
-            !!recipient?.contactDetails.account.profile?.publicEncryptionKey;
+            !!recipient?.contact.account.profile?.publicEncryptionKey;
 
         //If the recipient is a dm3 user we can send the message to the delivery service
         if (recipientIsDm3User) {
-            return await this._dispatchMessage(contact, recipient, message);
+            return await this._dispatchMessage(
+                contact,
+                recipient.contact,
+                message,
+            );
         }
 
         //There are cases were a messages is already to be send even though the contract hydration is not finished yet.
         //This happens if a message has been picked up from the delivery service and the clients sends READ_RECEIVE or READ_OPENED acknowledgements
         //In that case we've to check again to the if the user is a DM3 user, before we decide to keep the message
         const potentialReceiver = this.conversations.conversations.find(
-            (c) => c.contactDetails.account.ensName === contact,
+            (c) => c.contact.account.ensName === contact,
         );
 
         //This should normally not happen, since the contact should be already in the contact list
@@ -104,12 +108,16 @@ export class Messages {
             return await this._haltMessage(contact, message);
         }
         const hydratedC = await this.conversations.hydrateExistingContactAsync(
-            potentialReceiver,
+            potentialReceiver.contact,
         );
 
         //If the user is a DM3 user we can send the message to the delivery service
-        if (hydratedC.contactDetails.account.profile?.publicEncryptionKey) {
-            return await this._dispatchMessage(contact, hydratedC, message);
+        if (hydratedC.contact.account.profile?.publicEncryptionKey) {
+            return await this._dispatchMessage(
+                contact,
+                hydratedC.contact,
+                message,
+            );
         }
 
         //If neither the recipient nor the potential recipient is a DM3 user we store the message in the storage
@@ -118,13 +126,13 @@ export class Messages {
 
     private _dispatchMessage = async (
         contact: string,
-        recipient: ContactPreview,
+        recipient: Contact,
         message: Message,
     ) => {
         //Build the envelops based on the message and the users profileKeys.
         //For each deliveryServiceProfile a envelop is created that will be sent to the delivery service
         const envelops = await Promise.all(
-            recipient.contactDetails.deliveryServiceProfiles.map(
+            recipient.deliveryServiceProfiles.map(
                 async (deliverServiceProfile) => {
                     return await buildEnvelop(
                         message,
@@ -133,10 +141,10 @@ export class Messages {
                         {
                             from: this.account!,
                             to: {
-                                ...recipient!.contactDetails.account,
+                                ...recipient!.account,
                                 //Cover edge case of lukso names. TODO discuss with the team and decide how to dela with non ENS names
                                 ensName: this.isLuksoName(recipient.name)
-                                    ? recipient.contactDetails.account.ensName
+                                    ? recipient.account.ensName
                                     : recipient.name,
                             },
                             deliverServiceProfile,
@@ -184,7 +192,7 @@ export class Messages {
         // When we have a recipient we can send the message using the socket connection
 
         //TODO either store msg in cache when sending or wait for the response from the delivery service¿
-        const recipientDs = recipient.contactDetails.deliveryServiceProfiles;
+        const recipientDs = recipient.deliveryServiceProfiles;
 
         if (!recipientDs) {
             //TODO storage msg in storage
@@ -209,7 +217,7 @@ export class Messages {
                     deliveryInformation: '',
                     //Because storing a message is always an internal process we dont need to sign it. The signature is only needed for the delivery service
                     signature: '',
-                    encryptedMessageHash: sha256(stringify(message)),
+                    messageHash: sha256(stringify(message)),
                     version: 'v1',
                 },
             },

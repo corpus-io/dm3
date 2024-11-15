@@ -1,4 +1,3 @@
-import winston from 'winston';
 import { getDatabase, getDbClient } from '../getDatabase';
 import { IDatabase } from '../IDatabase';
 const SENDER_ADDRESS = '0x25A643B6e52864d0eD816F1E43c0CF49C83B8292';

@@ -2,10 +2,14 @@
 import {
     Account,
     DeliveryServiceProfile,
+    getAccountDisplayName,
     normalizeEnsName,
 } from '@dm3-org/dm3-lib-profile';
-import { Conversation, StorageAPI } from '@dm3-org/dm3-lib-storage';
-import { ContactPreview, getEmptyContact } from './types';
+import {
+    StorageAPI,
+    Conversation as ConversationDto,
+} from '@dm3-org/dm3-lib-storage';
+import { Contact, Conversation, getEmptyContact } from './types';
 import { Tld } from '../tld/Tld';
 import { hydrateContract as hydrateContact } from './hydrate/hydrateContact';
 import { ethers } from 'ethers';
@@ -17,7 +21,7 @@ export class Conversations {
     private readonly addressEnsSubdomain: string;
     private readonly account: Account;
 
-    public conversations: ContactPreview[];
+    public conversations: Conversation[];
 
     constructor(
         storageApi: StorageAPI,
@@ -38,12 +42,12 @@ export class Conversations {
         const contactTldName = normalizeEnsName(_ensName);
 
         const aliasName = await this.tld.resolveTLDtoAlias(contactTldName);
-        const newConversation: Conversation = {
+        const newConversation: ConversationDto = {
             contactEnsName: aliasName,
-            contactProfileLocation: [contactTldName], //(ID)
+            contactProfileLocation: [contactTldName],
             isHidden: false,
-            previewMessage: undefined,
             updatedAt: new Date().getTime(),
+            previewMessage: undefined,
         };
         const conversationPreview = this._addConversation(newConversation);
         //Add the contact to the storage in the background
@@ -51,7 +55,7 @@ export class Conversations {
         return conversationPreview;
     }
 
-    private async _addConversation(conversation: Conversation) {
+    private async _addConversation(conversation: ConversationDto) {
         const ensName = normalizeEnsName(conversation.contactEnsName);
         //Check if the contact is the user itself
         const isOwnContact =
@@ -62,7 +66,7 @@ export class Conversations {
         }
         const alreadyAddedContact = this.conversations.find(
             (existingContact) =>
-                existingContact.contactDetails.account.ensName === ensName,
+                existingContact.contact.account.ensName === ensName,
         );
         //If the contact is already in the list return it
         if (alreadyAddedContact) {
@@ -78,15 +82,21 @@ export class Conversations {
         const previewMessage =
             conversation.previewMessage?.envelop?.message?.message;
 
-        const newContact: ContactPreview = getEmptyContact(
+        const newContact: Contact = getEmptyContact(
             ensName,
             previewMessage,
             conversation.isHidden,
             conversation.updatedAt,
             conversation.contactProfileLocation,
         );
+
+        const newConversation: Conversation = {
+            //TODO change that once Message class has been implemented
+            messages: undefined as any,
+            contact: newContact,
+        };
         //Set the new contact to the list
-        this._setContactsSafe([newContact]);
+        this._setContactsSafe([newConversation]);
 
         const hydratedContact = await hydrateContact(
             this.provider,
@@ -95,15 +105,19 @@ export class Conversations {
             this.addressEnsSubdomain,
         );
 
-        this.conversations.push(hydratedContact);
+        const hydratedConversation: Conversation = {
+            messages: undefined as any,
+            contact: hydratedContact,
+        };
+        this.conversations.push(hydratedConversation);
 
         //Return the new onhydrated contact
-        return newContact;
+        return hydratedConversation;
     }
 
-    public hydrateExistingContactAsync = async (contact: ContactPreview) => {
-        const conversation: Conversation = {
-            contactEnsName: contact.contactDetails.account.ensName,
+    public hydrateExistingContactAsync = async (contact: Contact) => {
+        const conversation: ConversationDto = {
+            contactEnsName: contact.account.ensName,
             contactProfileLocation: contact.contactProfileLocation,
             previewMessage: undefined,
             isHidden: contact.isHidden,
@@ -115,19 +129,23 @@ export class Conversations {
             this.tld.resolveTLDtoAlias,
             this.addressEnsSubdomain,
         );
-        this.conversations.push(hydratedContact);
+        const hydratedConversation: Conversation = {
+            messages: undefined as any,
+            contact: hydratedContact,
+        };
+        this.conversations.push(hydratedConversation);
 
-        return hydratedContact;
+        return hydratedConversation;
     };
 
-    private _setContactsSafe(newContacts: ContactPreview[]) {
+    private _setContactsSafe(newConversations: Conversation[]) {
         //Dont add duplicates
-        const uniqueContacts = newContacts.filter(
+        const uniqueContacts = newConversations.filter(
             (newContact) =>
                 !this.conversations.some(
                     (existingContact) =>
-                        existingContact.contactDetails.account.ensName ===
-                        newContact.contactDetails.account.ensName,
+                        existingContact.contact.account.ensName ===
+                        newContact.contact.account.ensName,
                 ),
         );
         this.conversations = [...this.conversations, ...uniqueContacts];

@@ -1,13 +1,14 @@
 import {
     Account,
+    DeliveryServiceProfile,
     getUserProfile,
     normalizeEnsName,
 } from '@dm3-org/dm3-lib-profile';
 import { Conversation } from '@dm3-org/dm3-lib-storage/dist/new/types';
 import { ethers } from 'ethers';
 import { fetchMessageSizeLimit } from './fetchSizeLimit';
-import { Contact, ContactPreview } from '../types';
-import { fetchDsProfiles } from './fetchDsProfiles';
+import { fetchDsProfiles, FetchDsProfilesResult } from './fetchDsProfiles';
+import { Contact } from '../types';
 
 export const hydrateContract = async (
     provider: ethers.providers.JsonRpcProvider,
@@ -41,14 +42,14 @@ export const hydrateContract = async (
 const _fetchContactPreview = async (
     provider: ethers.providers.JsonRpcProvider,
     conversation: Conversation,
-    contact: Contact,
+    contact: FetchDsProfilesResult,
     resolveAliasToTLD: (
         alias: string,
         foreinTldName?: string,
     ) => Promise<string>,
     messageSizeLimit: number,
     addrEnsSubdomain: string,
-): Promise<ContactPreview> => {
+): Promise<Contact> => {
     return {
         //display name, if alias is not defined the addr ens name will be used
         name: await resolveAliasToTLD(
@@ -59,12 +60,13 @@ const _fetchContactPreview = async (
             ],
         ),
         contactProfileLocation: conversation.contactProfileLocation,
-        message: conversation.previewMessage?.envelop.message.message,
+        // message: conversation.previewMessage?.envelop.message.message,
         image: '',
-        contactDetails: contact,
         isHidden: conversation.isHidden,
         messageSizeLimit: messageSizeLimit,
         updatedAt: conversation.updatedAt,
+        account: contact.account,
+        deliveryServiceProfiles: contact.deliveryServiceProfiles,
     };
 };
 

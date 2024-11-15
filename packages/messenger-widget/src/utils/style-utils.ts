@@ -52,6 +52,7 @@ export const setTheme = (theme: string | undefined | null) => {
             --alternate-contact-background-color: ${themeDetails.alternateContactBackgroundColor};
             --menu-background-color: ${themeDetails.menuBackgroundColor};
             --preferences-highlighted-color: ${themeDetails.preferencesHighlightedColor};
+            --configure-profile-modal-background-color: ${themeDetails.configureProfileModalBackgroundColor};
         }`,
         }),
     );

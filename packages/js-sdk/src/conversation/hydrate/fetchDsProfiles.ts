@@ -7,10 +7,15 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import { Contact } from '../types';
 
+export interface FetchDsProfilesResult {
+    account: Account;
+    deliveryServiceProfiles: DeliveryServiceProfile[];
+}
+
 export const fetchDsProfiles = async (
     provider: ethers.providers.JsonRpcProvider,
     account: Account,
-): Promise<Contact> => {
+): Promise<FetchDsProfilesResult> => {
     const deliveryServiceEnsNames = account.profile?.deliveryServices ?? [];
     if (deliveryServiceEnsNames.length === 0) {
         //If there is nop DS profile the message will be storaged at the client side until they recipient has createed an account

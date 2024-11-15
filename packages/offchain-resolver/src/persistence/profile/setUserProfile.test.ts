@@ -2,12 +2,12 @@ import { getDatabase, getDbClient } from '../getDatabase';
 import { IDatabase } from '../IDatabase';
 import { setUserProfile } from './setUserProfile';
 import { ethers } from 'ethers';
-import winston from 'winston';
 import { SignedUserProfile } from '@dm3-org/dm3-lib-profile';
 import { PrismaClient } from '@prisma/client';
 import { clearDb } from '../clearDb';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { getProfileContainer } from './getProfileContainer';
 
 chai.use(chaiAsPromised);
 
@@ -61,7 +61,7 @@ describe('setUserProfile', () => {
 
         expect(writeResult).to.be.true;
     });
-    it('Rejects if a name already has profile attached', async () => {
+    it('Updates the profile if it already exists', async () => {
         const { address } = ethers.Wallet.createRandom();
 
         const profile: SignedUserProfile = {
@@ -84,12 +84,24 @@ describe('setUserProfile', () => {
         );
         expect(firstWrite).to.be.true;
 
+        // add new DS to the profile
+        const newProfile: SignedUserProfile = { ...profile };
+        newProfile.profile.deliveryServices = ['ds.eth'];
+
         //This should reject bc the subdomain already has a profile
         const secondWrite = await setUserProfile(prismaClient)(
             'foo.eth',
-            profile,
+            newProfile,
             address,
         );
-        expect(secondWrite).to.be.false;
+
+        const retrievedProfile = await getProfileContainer(prismaClient)(
+            'foo.eth',
+        );
+
+        expect(secondWrite).to.be.true;
+        expect(JSON.stringify(retrievedProfile?.profile)).to.equal(
+            JSON.stringify(newProfile),
+        );
     });
 });

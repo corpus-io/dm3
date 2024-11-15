@@ -2,10 +2,9 @@
 import { DeliveryServiceProfileKeys } from '@dm3-org/dm3-lib-profile';
 import { ethers } from 'ethers';
 import { NextFunction, Request, Response } from 'express';
-import winston from 'winston';
 
 export function logRequest(req: Request, res: Response, next: NextFunction) {
-    winston.loggers.get('default').info({
+    console.info({
         method: req.method,
         url: req.url,
         timestamp: new Date().getTime(),

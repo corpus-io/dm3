@@ -4,7 +4,7 @@ import {
     UserProfile,
 } from '@dm3-org/dm3-lib-profile';
 import { stringify } from '@dm3-org/dm3-lib-shared';
-import { Session } from './Session';
+import { Account } from './Account';
 import { getUserProfile, submitUserProfile } from './UserProfile';
 
 const SENDER_NAME = 'alice.eth';
@@ -68,11 +68,11 @@ describe('UserProfile', () => {
         it('override a userProfile that already exists but with other nonce', async () => {
             const setAccount = () => Promise.resolve();
             const getAccount = async (address: string) => {
-                const session = async (
+                const account = async (
                     account: string,
                     token: string,
                     profile: UserProfile,
-                ): Promise<Session> => {
+                ): Promise<Account> => {
                     const signedUserProfile = await signProfile(profile);
                     return {
                         account,
@@ -86,7 +86,7 @@ describe('UserProfile', () => {
                     };
                 };
 
-                return session(SENDER_ADDRESS, '123', emptyProfile);
+                return account(SENDER_ADDRESS, '123', emptyProfile);
             };
 
             const singedUserProfile = await signProfile(emptyProfile);
@@ -135,16 +135,16 @@ describe('UserProfile', () => {
         });
     });
     describe('GetUserProfile', () => {
-        it('Returns undefined if address has no session', async () => {
+        it('Returns undefined if address has no account', async () => {
             const getAccount = () => Promise.resolve(null);
 
             const profile = await getUserProfile(getAccount, RANDO_NAME);
 
             expect(profile).toBeUndefined();
         });
-        it('Returns the signedUserProfile if a session was created', async () => {
+        it('Returns the signedUserProfile if a account was created', async () => {
             const getAccount = () =>
-                Promise.resolve({ signedUserProfile: {} } as Session);
+                Promise.resolve({ signedUserProfile: {} } as Account);
 
             const profile = await getUserProfile(getAccount, RANDO_NAME);
 

@@ -1,6 +1,6 @@
-import { Session } from '@dm3-org/dm3-lib-delivery';
+import { Account } from '@dm3-org/dm3-lib-delivery';
 import {
-    Auth,
+    Authenticate,
     errorHandler,
     getCachedWebProvider,
     getLuksoProvider,
@@ -19,17 +19,17 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import webpush from 'web-push';
-import winston from 'winston';
 import { startCleanUpPendingMessagesJob } from './cleanup/cleanUpPendingMessages';
 import { getDeliveryServiceProperties } from './config/getDeliveryServiceProperties';
 import Delivery from './delivery';
 import { onConnection } from './messaging';
+import Metrics from './metrics';
 import Notifications from './notifications';
 import { IDatabase, getDatabase } from './persistence/getDatabase';
 import { Profile } from './profile/profile';
 import RpcProxy from './rpc/rpc-proxy';
-import { WebSocketManager } from './ws/WebSocketManager';
 import { socketAuth } from './socketAuth';
+import { WebSocketManager } from './ws/WebSocketManager';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -47,7 +47,7 @@ const getDbWithAddressResolvedGetAccount = (
 ): IDatabase => {
     const getAccountForEnsName = (
         web3Provider: ethers.providers.JsonRpcProvider,
-        getAccount: (ensName: string) => Promise<Session | null>,
+        getAccount: (ensName: string) => Promise<Account | null>,
     ) => {
         return async (ensName: string) => {
             const address = await web3Provider.resolveName(ensName);
@@ -92,15 +92,6 @@ const getDbWithAddressResolvedGetAccount = (
 //TODO remove
 app.use(cors());
 app.use(bodyParser.json());
-
-declare global {
-    var logger: winston.Logger;
-}
-
-global.logger = winston.createLogger({
-    level: process.env.LOG_LEVEL ?? 'info',
-    transports: [new winston.transports.Console()],
-});
 
 (async () => {
     // load environment
@@ -151,11 +142,8 @@ global.logger = winston.createLogger({
         return res.status(200).send('Hello DM3');
     });
 
-    //Auth
-    //socketAuth
-    //restAuth
-
-    app.use('/auth', Auth(db, serverSecret, web3Provider));
+    app.use('/metrics', Metrics(db, deliveryServiceProperties));
+    app.use('/auth', Authenticate(db, serverSecret, web3Provider));
     app.use('/profile', Profile(db, web3Provider, luksoProvider, serverSecret));
     app.use('/delivery', Delivery(web3Provider, db, serverSecret));
     app.use(

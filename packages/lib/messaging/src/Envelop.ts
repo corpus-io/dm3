@@ -20,7 +20,7 @@ export interface EnvelopeMetadata {
     version: string;
     encryptionScheme?: string;
     deliveryInformation: string | DeliveryInformation;
-    encryptedMessageHash: string;
+    messageHash: string;
     signature: string;
 }
 
@@ -141,7 +141,7 @@ export async function buildEnvelop(
     /**
      * Builds the {@see EnvelopMetadata} for the message
      * and encrypts the {@see DeliveryInformation} using the deliveryServiceEncryptionPubKey
-     * the encryptedMessageHash field is mendatory to establish a link between the message and metadata
+     * the messageHash field is mendatory to establish a link between the message and metadata
      */
     const envelopeMetadata: Omit<EnvelopeMetadata, 'signature'> = {
         encryptionScheme: 'x25519-chacha20-poly1305',
@@ -151,7 +151,9 @@ export async function buildEnvelop(
                 stringify(deliveryInformation),
             ),
         ),
-        encryptedMessageHash: sha256(stringify(encryptedMessage)),
+        //Even though the fields name is messageHash we hash the message to be able to find message duplicates
+        //For examples messages comming from the same DS
+        messageHash: sha256(stringify(message)),
         version: 'v1',
     };
 

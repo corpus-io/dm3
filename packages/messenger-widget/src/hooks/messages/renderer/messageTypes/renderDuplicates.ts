@@ -7,8 +7,8 @@ export const renderDuplicates = (messages: MessageModel[]) => {
             index ===
             self.findIndex(
                 (t) =>
-                    t.envelop.metadata?.encryptedMessageHash ===
-                    message.envelop.metadata?.encryptedMessageHash,
+                    t.envelop.metadata?.messageHash ===
+                    message.envelop.metadata?.messageHash,
             ),
     );
 };

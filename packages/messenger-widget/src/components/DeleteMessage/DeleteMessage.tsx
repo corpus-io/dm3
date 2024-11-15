@@ -32,7 +32,7 @@ export default function DeleteMessage() {
         }
 
         const messageHash =
-            messageView.messageData?.envelop.metadata?.encryptedMessageHash;
+            messageView.messageData?.envelop.metadata?.messageHash;
 
         setMessageView(resetMessageView);
 

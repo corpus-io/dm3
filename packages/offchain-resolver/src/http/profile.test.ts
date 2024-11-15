@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 import express from 'express';
 
 import request from 'supertest';
-import winston from 'winston';
+
 import { getDatabase, getDbClient } from '../persistence/getDatabase';
 import { IDatabase } from '../persistence/IDatabase';
 import { profile } from './profile';
@@ -302,8 +302,7 @@ describe('Profile', () => {
                     subdomain: 'beta-addr.dm3.eth',
                 });
 
-            expect(res2.status).to.equal(400);
-            expect(res2.body.error).to.eql('subdomain already claimed');
+            expect(res2.status).to.equal(200);
         });
         it('Rejects if subdomain is not supported', async () => {
             app.use(profile(provider, luksoProvider));

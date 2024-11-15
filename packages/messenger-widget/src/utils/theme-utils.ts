@@ -45,6 +45,7 @@ export const defaultTheme: any = {
     alternateContactBackgroundColor: '#5443931A',
     menuBackgroundColor: '#2A2B38',
     preferencesHighlightedColor: '#8b7ff4',
+    configureProfileModalBackgroundColor: '#D9D9D9',
 };
 
 export const getCustomizedTheme = (themeCss: any) => {
@@ -165,5 +166,8 @@ export const getCustomizedTheme = (themeCss: any) => {
         preferencesHighlightedColor:
             themeCss.preferencesHighlightedColor ??
             defaultTheme.preferencesHighlightedColor,
+        configureProfileModalBackgroundColor:
+            themeCss.configureProfileModalBackgroundColor ??
+            defaultTheme.configureProfileModalBackgroundColor,
     };
 };

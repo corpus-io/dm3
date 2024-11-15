@@ -1,7 +1,7 @@
 import { ContactPreview } from '../../interfaces/utils';
 import { ConversationContextType } from '../ConversationContext';
 
-//Provide a mocked Auth context
+//Provide a mocked Authenticate context
 //Override the default values with the provided values
 export const getMockedConversationContext = (
     override?: Partial<ConversationContextType>,

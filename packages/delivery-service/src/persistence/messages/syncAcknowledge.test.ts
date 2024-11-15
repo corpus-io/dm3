@@ -1,20 +1,12 @@
 import { EncryptionEnvelop } from '@dm3-org/dm3-lib-messaging';
-import winston from 'winston';
 import { IDatabase, Redis, getDatabase, getRedisClient } from '../getDatabase';
 
 const SENDER_ADDRESS = '0x25A643B6e52864d0eD816F1E43c0CF49C83B8292';
 const RECEIVER_ADDRESS = '0xDd36ae7F9a8E34FACf1e110c6e9d37D0dc917855';
 
-global.logger = winston.createLogger({
-    transports: [new winston.transports.Console()],
-});
-
 describe('Sync Acknowledge', () => {
     let redisClient: Redis;
     let db: IDatabase;
-    const logger = winston.createLogger({
-        transports: [new winston.transports.Console()],
-    });
 
     beforeEach(async () => {
         redisClient = await getRedisClient();
@@ -36,7 +28,7 @@ describe('Sync Acknowledge', () => {
                     from: SENDER_ADDRESS,
                 },
                 signature: '',
-                encryptedMessageHash: '0x123',
+                messageHash: '0x123',
                 version: '',
                 encryptionScheme: 'x25519-chacha20-poly1305',
             },
@@ -49,7 +41,7 @@ describe('Sync Acknowledge', () => {
                     from: SENDER_ADDRESS,
                 },
                 signature: '',
-                encryptedMessageHash: '0x456',
+                messageHash: '0x456',
                 version: '',
                 encryptionScheme: 'x25519-chacha20-poly1305',
             },
@@ -84,9 +76,7 @@ describe('Sync Acknowledge', () => {
         );
 
         expect(afterSyncAcknowledge.length).toBe(1);
-        expect(afterSyncAcknowledge[0].metadata.encryptedMessageHash).toBe(
-            '0x456',
-        );
+        expect(afterSyncAcknowledge[0].metadata.messageHash).toBe('0x456');
     });
     it('returns false if message is not found', async () => {
         const envelop1: EncryptionEnvelop = {
@@ -97,7 +87,7 @@ describe('Sync Acknowledge', () => {
                     from: SENDER_ADDRESS,
                 },
                 signature: '',
-                encryptedMessageHash: '0x123',
+                messageHash: '0x123',
                 version: '',
                 encryptionScheme: 'x25519-chacha20-poly1305',
             },

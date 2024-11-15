@@ -76,8 +76,7 @@ export function EmojiModal(props: EmojiProps) {
             messageData: undefined,
         });
 
-        const referenceMessageHash =
-            props.envelop.metadata?.encryptedMessageHash;
+        const referenceMessageHash = props.envelop.metadata?.messageHash;
 
         // react to the message
         const messageData = await createReactionMessage(

@@ -5,7 +5,7 @@ import { nonceFilterFactory } from './filter/nonceFilter/NonceFilter';
 import { SpamFilter, SpamFilterFactory } from './filter/SpamFilter';
 import { tokenBalanceFilterFactory } from './filter/tokenBalanceFilter/TokenBalanceFilter';
 import { SpamFilterRules } from './SpamFilterRules';
-import { Session } from '../Session';
+import { Account } from '../Account';
 
 export type { SpamFilterRules };
 
@@ -35,11 +35,11 @@ function compileSpamFilter(filter: SpamFilter[]) {
     };
 }
 /**
- * Maps the {@see SpamFilterRules} a user has specified in they session to an array of filters
+ * Maps the {@see SpamFilterRules} a user has specified in they account to an array of filters
  */
 function getUsersSpamFilters(
     provider: ethers.providers.BaseProvider,
-    { spamFilterRules }: Session,
+    { spamFilterRules }: Account,
 ) {
     //User has not defined any rules
     if (!spamFilterRules) {
@@ -55,10 +55,10 @@ function getUsersSpamFilters(
  */
 export async function isSpam(
     provider: ethers.providers.BaseProvider,
-    session: Session,
+    account: Account,
     deliveryInformation: DeliveryInformation,
 ) {
-    const usersSpamFilters = getUsersSpamFilters(provider, session);
+    const usersSpamFilters = getUsersSpamFilters(provider, account);
     const filter = compileSpamFilter(usersSpamFilters);
 
     //The predicate of a filter returns true if the message is valid.

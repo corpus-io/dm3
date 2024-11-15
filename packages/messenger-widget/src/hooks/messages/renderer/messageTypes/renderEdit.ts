@@ -1,6 +1,14 @@
 import { MessageModel } from '../../useMessage';
 
-export const renderEdit = (messages: MessageModel[]) => {
+export const renderEdit = (_messages: MessageModel[]) => {
+    //Copy messages object to not mutate the original object
+    const messages: MessageModel[] = [..._messages];
+    //Before processing the messages have to be sorted ASC by timestamp
+    messages.sort(
+        (a, b) =>
+            a.envelop.message.metadata.timestamp -
+            b.envelop.message.metadata.timestamp,
+    );
     //To apply insertions we have to find every message that is an edit and find the original message
     //A message can be edited multiple times so we always have to find the original message
     //A path for a simple edit looks like [NEW, EDIT]
@@ -24,7 +32,7 @@ export const renderEdit = (messages: MessageModel[]) => {
         while (currentMsg.envelop.message.metadata.type === 'EDIT') {
             const originalMsg = messages.find(
                 (m, i) =>
-                    m.envelop.metadata?.encryptedMessageHash ===
+                    m.envelop.metadata?.messageHash ===
                     currentMsg.envelop.message.metadata.referenceMessageHash,
             );
             if (!originalMsg) {

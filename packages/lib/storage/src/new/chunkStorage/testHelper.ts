@@ -33,7 +33,7 @@ export function makeEnvelop(
                 to: '',
                 deliveryInstruction: '',
             },
-            encryptedMessageHash: '',
+            messageHash: '',
             version: '',
             encryptionScheme: '',
             signature: '',

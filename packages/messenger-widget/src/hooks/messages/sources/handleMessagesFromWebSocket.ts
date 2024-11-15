@@ -4,7 +4,7 @@ import {
     Envelop,
     MessageState,
 } from '@dm3-org/dm3-lib-messaging';
-import { ProfileKeys } from '@dm3-org/dm3-lib-profile';
+import { normalizeEnsName, ProfileKeys } from '@dm3-org/dm3-lib-profile';
 import { ContactPreview } from '../../../interfaces/utils';
 import { StoreMessageAsync } from '../../storage/useStorage';
 import { ReceiptDispatcher } from '../receipt/ReceiptDispatcher';
@@ -40,13 +40,11 @@ export const handleMessagesFromWebSocket = async (
 
     //we wait for the contact to be added to resolve TLD to alias
     const contactPreview = await addConversation(
-        decryptedEnvelop.message.metadata.from,
+        normalizeEnsName(decryptedEnvelop.message.metadata.from),
     );
 
     // Resolve TLD to alias
     const contact = contactPreview?.contactDetails.account.ensName!;
-
-    console.log('contactPreview MSGWS', contactPreview);
 
     const messageState =
         selectedContact?.contactDetails.account.ensName === contact
@@ -65,8 +63,8 @@ export const handleMessagesFromWebSocket = async (
         if (
             prev[contact]?.find(
                 (m) =>
-                    m.envelop.metadata?.encryptedMessageHash ===
-                    messageModel.envelop.metadata?.encryptedMessageHash,
+                    m.envelop.metadata?.messageHash ===
+                    messageModel.envelop.metadata?.messageHash,
             )
         ) {
             return prev;

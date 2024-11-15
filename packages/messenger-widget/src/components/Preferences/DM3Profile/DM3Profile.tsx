@@ -13,8 +13,8 @@ export function DM3Profile() {
     const description =
         screenWidth <= MOBILE_SCREEN_WIDTH
             ? ''
-            : 'Your dm3 profile needs to be published. You can use your own ENS name, ' +
-              'get a DM3 name, or keep your wallet address.';
+            : 'Your dm3 profile needs to be published. You can use your own web3 name (ENS, ...),' +
+              'get a dm3 name, or keep your wallet address.';
 
     return (
         <div>

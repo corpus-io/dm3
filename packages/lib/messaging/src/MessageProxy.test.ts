@@ -17,7 +17,7 @@ const proxyEnvelop = {
             encryptionEnvelop: {
                 metadata: {
                     deliveryInformation: stringify(encryptedPayloadMock),
-                    encryptedMessageHash:
+                    messageHash:
                         '0xdac53d80a308eb9a48caca48719aada24a32f1cede2f4368817aa63b1375a09f',
                     encryptionScheme: 'x25519-chacha20-poly1305',
                     signature:
@@ -31,7 +31,7 @@ const proxyEnvelop = {
             encryptionEnvelop: {
                 metadata: {
                     deliveryInformation: stringify(encryptedPayloadMock),
-                    encryptedMessageHash:
+                    messageHash:
                         '0xdac53d80a308eb9a48caca48719aada24a32f1cede2f4368817aa63b1375a09f',
                     encryptionScheme: 'x25519-chacha20-poly1305',
                     signature:

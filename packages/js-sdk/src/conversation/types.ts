@@ -9,7 +9,7 @@ class Messages {
     public addMessage(message: string) {}
 }
 
-interface Contact {
+export interface Contact {
     name: string;
     contactProfileLocation: string[];
     image: string;
@@ -34,13 +34,12 @@ export const getEmptyContact = (
     const newContact: Contact = {
         name: getAccountDisplayName(ensName, 25),
         contactProfileLocation,
-        previewMessage: message,
         image: '',
         account: {
             ensName,
         },
         deliveryServiceProfiles: [],
-        isHidden,
+        isHidden: false,
         messageSizeLimit: 0,
         updatedAt: updatedAt,
     };

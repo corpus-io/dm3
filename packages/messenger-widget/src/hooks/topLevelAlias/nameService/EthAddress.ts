@@ -14,9 +14,11 @@ export class EthAddressResolver implements ITLDResolver {
         return ensName.endsWith(this.addrEnsSubdomain);
     }
     //The alias format is used to display in the UI
-    //e.g. 0x1234.user.dm3.eth -> 0x1234
+    //Since that is the lowest tier there is no alias for such an tldName left.
+    //e.g. 0x1234.user.dm3.eth -> 0x1234.user.dm3.eth
     async resolveAliasToTLD(ensName: string): Promise<string> {
-        return ensName.split('.')[0];
+        //return ensName.split('.')[0];
+        return ensName;
     }
     //The alias format is used to store the contact in the DB
     //e.g. 0x1234 -> 0x1234.user.dm3.eth

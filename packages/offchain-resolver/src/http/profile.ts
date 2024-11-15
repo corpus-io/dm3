@@ -278,16 +278,6 @@ export function profile(
                     return res.status(400).send({ error: 'invalid profile' });
                 }
 
-                const hasAddressProfile =
-                    !!(await req.app.locals.db.getProfileContainer(address));
-
-                //One address can only claim one subdomain
-                if (hasAddressProfile) {
-                    return res.status(400).send({
-                        error: 'address has already claimed a subdomain',
-                    });
-                }
-
                 const name = `${address}.${subdomain}`;
 
                 //ask the subdomain manager if the names subdomain is supported
@@ -295,15 +285,6 @@ export function profile(
                     return res.status(400).send({
                         error: `subdomain ${subdomain} is not supported`,
                     });
-                }
-
-                const profileExists =
-                    !!(await req.app.locals.db.getProfileContainer(name));
-
-                if (profileExists) {
-                    return res
-                        .status(400)
-                        .send({ error: 'subdomain already claimed' });
                 }
 
                 await req.app.locals.db.setUserProfile(

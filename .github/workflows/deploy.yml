@@ -134,13 +134,15 @@ jobs:
                   rsync -avz -e 'ssh -i ./ssh-key' ./.env app@${{ vars.HOST_DOMAIN }}:/home/app/dm3
                   rsync -avz -e 'ssh -i ./ssh-key' ./dm3-*.tar app@${{ vars.HOST_DOMAIN }}:/home/app/dm3 
                   rsync -avz -e 'ssh -i ./ssh-key' ./nginx.conf app@${{ vars.HOST_DOMAIN }}:/home/app/dm3
-                  rsync -avz -e 'ssh -i ./ssh-key' ./docker/docker-compose.yml app@${{ vars.HOST_DOMAIN }}:/home/app/dm3
             - name: Stop docker on server
               run: |
                   ssh -i ./ssh-key app@${{ vars.HOST_DOMAIN }} "\
                   cd dm3 && docker compose down"
                   ssh -i ./ssh-key root@${{ vars.HOST_DOMAIN }} "\
                   systemctl restart docker.service"
+            - name: Send docker compose to server
+              run: |
+                  rsync -avz -e 'ssh -i ./ssh-key' ./docker/docker-compose.yml app@${{ vars.HOST_DOMAIN }}:/home/app/dm3
             - name: Load docker images
               run: |
                   ssh -i ./ssh-key app@${{ vars.HOST_DOMAIN }} "\

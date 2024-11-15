@@ -11,7 +11,6 @@ import { ModalContext } from '../../../../context/ModalContext';
 import { ConfigureDM3NameContext } from '../../context/ConfigureDM3NameContext';
 import { fetchChainIdFromServiceName } from '../../bl';
 import { DM3ConfigurationContext } from '../../../../context/DM3ConfigurationContext';
-import { DeliveryServiceContext } from '../../../../context/DeliveryServiceContext';
 
 export const ConfigureEnsProfile = (props: IChain) => {
     const connectedChainId = useChainId();

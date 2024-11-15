@@ -1,5 +1,5 @@
 import './SendMessage.css';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import sendBtnIcon from '../../assets/images/send-btn.svg';
 import { AuthContext } from '../../context/AuthContext';
 import { ConversationContext } from '../../context/ConversationContext';
@@ -15,8 +15,13 @@ export function SendMessage(props: MessageDataProps) {
     const { selectedContact } = useContext(ConversationContext);
     const { messageView, setMessageView } = useContext(UiViewContext);
     const { setLastMessageAction } = useContext(ModalContext);
+    const [isSendBtnDisabled, setIsSendBtnDisabled] = useState<boolean>(false);
 
     async function submit() {
+        if (isSendBtnDisabled) {
+            return;
+        }
+        setIsSendBtnDisabled(true);
         await onSubmitMessage(
             messageView,
             setMessageView,
@@ -27,6 +32,7 @@ export function SendMessage(props: MessageDataProps) {
             account!,
             selectedContact!,
         );
+        setIsSendBtnDisabled(false);
     }
 
     return (

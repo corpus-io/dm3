@@ -3,10 +3,11 @@ import { ethersHelper, stringify } from '@dm3-org/dm3-lib-shared';
 import { ethers } from 'ethers';
 import { closeLoader, startLoader } from '../../../Loader/Loader';
 import { NAME_TYPE } from '../common';
+import ENS from '@ensdomains/ensjs';
 
 // method to check ENS name is valid or not
 const isEnsNameValid = async (
-    mainnetProvider: ethers.providers.StaticJsonRpcProvider,
+    mainnetProvider: ethers.providers.JsonRpcProvider,
     ensName: string,
     ethAddress: string,
     setError: (type: NAME_TYPE | undefined, msg: string) => void,
@@ -17,14 +18,14 @@ const isEnsNameValid = async (
         return false;
     }
 
-    const address = await ethersHelper.resolveOwner(mainnetProvider!, ensName);
+    // Fetch owner of ENS name
+    const ens = getEnsUtils(mainnetProvider);
+    const owner = await ens.name(ensName).getAddress();
 
-    if (address === null) {
+    if (owner === null) {
         setError(NAME_TYPE.ENS_NAME, 'Resolver not found');
         return false;
     }
-
-    const owner = await ethersHelper.resolveName(mainnetProvider!, ensName);
 
     if (
         owner &&
@@ -77,7 +78,12 @@ export const submitEnsNameTransaction = async (
             const response = await ethersHelper.executeTransaction(tx);
             await response.wait();
             setEnsNameFromResolver(ensName);
+            // stop loader
+            closeLoader();
+            return true;
         } else {
+            // stop loader
+            closeLoader();
             throw Error('Error creating publish transaction');
         }
     } catch (e: any) {
@@ -88,10 +94,10 @@ export const submitEnsNameTransaction = async (
                 ? 'User rejected transaction'
                 : 'You are not the owner/manager of this name',
         );
+        // stop loader
+        closeLoader();
+        return false;
     }
-
-    // stop loader
-    closeLoader();
 };
 
 export async function getPublishProfileOnchainTransaction(
@@ -109,17 +115,17 @@ export async function getPublishProfileOnchainTransaction(
         throw Error('No signature');
     }
 
-    const ethersResolver = await ethersHelper.getResolver(
-        mainnetProvider,
-        ensName,
-    );
+    const ens = getEnsUtils(mainnetProvider);
 
-    if (!ethersResolver) {
+    // Fetch resolver of account
+    const ensResolverAddress = await ens.name(ensName).getResolver();
+
+    if (!ensResolverAddress) {
         throw Error('No resolver found');
     }
 
     const resolver = ethersHelper.getConractInstance(
-        ethersResolver.address,
+        ensResolverAddress,
         [
             'function setText(bytes32 node, string calldata key, string calldata value) external',
         ],
@@ -141,3 +147,12 @@ export async function getPublishProfileOnchainTransaction(
         args: [node, key, value],
     };
 }
+
+const getEnsUtils = (
+    mainnetProvider: ethers.providers.StaticJsonRpcProvider,
+) => {
+    return new ENS({
+        provider: mainnetProvider,
+        ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    });
+};

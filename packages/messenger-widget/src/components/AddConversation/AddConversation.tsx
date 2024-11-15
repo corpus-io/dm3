@@ -13,6 +13,7 @@ import {
 } from '../../utils/enum-type-utils';
 import { closeLoader, startLoader } from '../Loader/Loader';
 import './AddConversation.css';
+import { normalizeEnsName } from '@dm3-org/dm3-lib-profile';
 
 // class for input field
 export const INPUT_FIELD_CLASS =
@@ -56,7 +57,8 @@ export default function AddConversation() {
                 return;
             }
 
-            const newContact = await addConversation(tldName);
+            const normalizedEnsName = normalizeEnsName(tldName);
+            const newContact = await addConversation(normalizedEnsName);
 
             const addConversationData = {
                 active: true,

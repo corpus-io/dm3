@@ -5,4 +5,6 @@ export interface DeliveryServiceProperties {
     //Number of bytes an envelop object should not exceed
     sizeLimit: number;
     notificationChannel: NotificationChannel[];
+    metricsCollectionIntervalInSeconds: number;
+    metricsRetentionDurationInSeconds: number;
 }

@@ -11,6 +11,7 @@ import { Loader, startLoader } from '../Loader/Loader';
 import { SignIn } from '../SignIn/SignIn';
 import { Siwe } from '../Siwe/Siwe';
 import { NotificationContextProvider } from '../../context/NotificationContext';
+import { DM3UserProfileContextProvider } from '../../context/DM3UserProfileContext';
 
 function DM3(props: Dm3Props) {
     const {
@@ -61,24 +62,28 @@ function DM3(props: Dm3Props) {
 
     return (
         <div id="data-rk-child" className="h-100">
-            <ConversationContextProvider config={props.config}>
-                <MessageContextProvider>
-                    <Loader />
-                    {!isProfileReady ? (
-                        props.config.siwe ? (
-                            <Siwe backgroundImage={props.config.signInImage} />
+            <DM3UserProfileContextProvider>
+                <ConversationContextProvider config={props.config}>
+                    <MessageContextProvider>
+                        <Loader />
+                        {!isProfileReady ? (
+                            props.config.siwe ? (
+                                <Siwe
+                                    backgroundImage={props.config.signInImage}
+                                />
+                            ) : (
+                                <SignIn />
+                            )
                         ) : (
-                            <SignIn />
-                        )
-                    ) : (
-                        <NotificationContextProvider>
-                            <div className="h-100 background-container">
-                                <Dashboard />
-                            </div>
-                        </NotificationContextProvider>
-                    )}
-                </MessageContextProvider>
-            </ConversationContextProvider>
+                            <NotificationContextProvider>
+                                <div className="h-100 background-container">
+                                    <Dashboard />
+                                </div>
+                            </NotificationContextProvider>
+                        )}
+                    </MessageContextProvider>
+                </ConversationContextProvider>
+            </DM3UserProfileContextProvider>
         </div>
     );
 }

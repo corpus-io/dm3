@@ -12,7 +12,7 @@ import { MessageProcessor } from './MessageProcessor';
 import { checkSignature, decryptAsymmetric } from '@dm3-org/dm3-lib-crypto';
 import {
     DeliveryServiceProperties,
-    Session,
+    Account,
     spamFilter,
 } from '@dm3-org/dm3-lib-delivery';
 import { UserProfile, normalizeEnsName } from '@dm3-org/dm3-lib-profile';
@@ -66,7 +66,7 @@ describe('MessageProcessor', () => {
         ensName: string,
         socketId?: string,
     ): Promise<
-        (Session & { spamFilterRules: spamFilter.SpamFilterRules }) | null
+        (Account & { spamFilterRules: spamFilter.SpamFilterRules }) | null
     > => {
         const emptyProfile: UserProfile = {
             publicSigningKey: '',
@@ -76,11 +76,11 @@ describe('MessageProcessor', () => {
         const isSender = getAddress(ensName) === sender.address;
         const isReceiver = getAddress(ensName) === receiver.address;
 
-        const session = (
+        const account = (
             account: string,
             token: string,
             profile: UserProfile,
-        ): Session => ({
+        ): Account => ({
             account,
             signedUserProfile: {
                 profile,
@@ -97,14 +97,14 @@ describe('MessageProcessor', () => {
 
         if (isSender) {
             return {
-                ...session(sender.address, '123', emptyProfile),
+                ...account(sender.address, '123', emptyProfile),
                 spamFilterRules: {},
             };
         }
 
         if (isReceiver) {
             return {
-                ...session(getAddress(receiver.address), 'abc', {
+                ...account(getAddress(receiver.address), 'abc', {
                     ...emptyProfile,
                     publicEncryptionKey:
                         receiver.profileKeys.encryptionKeyPair.publicKey,
@@ -256,7 +256,7 @@ describe('MessageProcessor', () => {
 
         await expect(() =>
             messageProcessor.processEnvelop(incomingEnvelop),
-        ).rejects.toEqual(Error('unknown session'));
+        ).rejects.toEqual(Error('unknown account'));
     });
     // //TODO remove skip once spam-filter is implemented
     // //TODO remove skip once spam-filter is implemented
@@ -265,7 +265,7 @@ describe('MessageProcessor', () => {
             ({
                 ...(await getAccount(address)),
                 spamFilterRules: { minNonce: 2 },
-            } as Session & { spamFilterRules: spamFilter.SpamFilterRules });
+            } as Account & { spamFilterRules: spamFilter.SpamFilterRules });
 
         const db = {
             createMessage: async () => {},
@@ -322,7 +322,7 @@ describe('MessageProcessor', () => {
             ({
                 ...(await getAccount(address)),
                 spamFilterRules: { minBalance: '0xa' },
-            } as Session & { spamFilterRules: spamFilter.SpamFilterRules });
+            } as Account & { spamFilterRules: spamFilter.SpamFilterRules });
 
         const db = {
             createMessage: async () => {},
@@ -384,7 +384,7 @@ describe('MessageProcessor', () => {
                         amount: '0xa',
                     },
                 },
-            } as Session & { spamFilterRules: spamFilter.SpamFilterRules });
+            } as Account & { spamFilterRules: spamFilter.SpamFilterRules });
 
         const db = {
             createMessage: async () => {},

@@ -77,6 +77,35 @@ export async function claimAddress(
 }
 
 /**
+ * updates profile with new delivery service nodes added
+ * @param address The ethereum address
+ * @param offchainResolverUrl The offchain resolver endpoint url
+ * @param subdomain The addr subdomain of the client .iE addr.dm3.eth
+ * @param signedUserProfile The signed dm3 user profile
+ */
+export async function updateProfile(
+    address: string,
+    offchainResolverUrl: string,
+    addrSubdomainDomain: string,
+    signedUserProfile: SignedUserProfile,
+) {
+    try {
+        const url = `${offchainResolverUrl}/profile/address`;
+        const data = {
+            signedUserProfile,
+            address,
+            subdomain: addrSubdomainDomain,
+        };
+
+        const { status } = await axios.post(url, data);
+        return status === 200;
+    } catch (err) {
+        console.log('update profile failed');
+        return false;
+    }
+}
+
+/**
  * returns the linked ENS name for an eth address
  * @param address The ethereum address
  * @param offchainResolverUrl The offchain resolver endpoint url

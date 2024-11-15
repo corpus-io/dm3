@@ -15,7 +15,7 @@ export const renderReadOpened = (messages: MessageModel[]) => {
         const openedMsg = readOpenedMsgs.find(
             (m) =>
                 m.envelop.message.metadata.referenceMessageHash ===
-                message.envelop.metadata?.encryptedMessageHash,
+                message.envelop.metadata?.messageHash,
         );
         return {
             ...message,

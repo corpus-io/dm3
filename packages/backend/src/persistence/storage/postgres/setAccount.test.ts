@@ -1,6 +1,10 @@
 import { UserProfile } from '@dm3-org/dm3-lib-profile';
 import { PrismaClient } from '@prisma/client';
-import { IBackendDatabase, getDatabase, getPrismaClient } from '../getDatabase';
+import {
+    IBackendDatabase,
+    getDatabase,
+    getPrismaClient,
+} from '../../getDatabase';
 
 const USER_NAME = '0x25A643B6e52864d0eD816F1E43c0CF49C83B8292.dm3.eth';
 
@@ -14,12 +18,6 @@ describe('Set Account', () => {
     });
 
     it('Creates a new Account ', async () => {
-        const profile: UserProfile = {
-            publicEncryptionKey: '',
-            publicSigningKey: '',
-            deliveryServices: [],
-        };
-
         const priorSetAccount = await db.getAccount(USER_NAME);
 
         //User has no account yet

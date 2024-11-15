@@ -7,10 +7,9 @@ export function handleGetDeliveryServiceProperties(
     deliveryServiceProperties: DeliveryServiceProperties,
 ) {
     if (!deliveryServiceProperties) {
-        global.logger.error({
-            method: 'RPC GET DELIVERY SERVICE PROPERTIES',
-            error: 'No Delivery Service Properties Set',
-        });
+        console.error(
+            'RPC GET DELIVERY SERVICE PROPERTIES: No Delivery Service Properties Set',
+        );
         return res.status(400).send({
             jsonrpc: '2.0',
             result: 'No Delivery Service Properties Set',

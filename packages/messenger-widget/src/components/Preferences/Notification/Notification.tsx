@@ -10,6 +10,7 @@ import { getVerficationModalContent } from './hooks/VerificationContent';
 import { DM3ConfigurationContext } from '../../../context/DM3ConfigurationContext';
 import { NotificationContext } from '../../../context/NotificationContext';
 import loader from '../../../assets/images/loader.svg';
+import { ModalContext } from '../../../context/ModalContext';
 
 export function Notification() {
     const { screenWidth } = useContext(DM3ConfigurationContext);
@@ -43,6 +44,8 @@ export function Notification() {
         isLoading,
         loaderData,
     } = useContext(NotificationContext);
+
+    const { disabledOptions } = useContext(ModalContext);
 
     return (
         <div className="position-relative h-100">
@@ -85,55 +88,59 @@ export function Notification() {
             </div>
 
             {/* Email notifications enabled/disabled */}
-            <div className="notification-content-left mt-4">
-                <div className="d-flex align-items-center">
-                    <Checkbox
-                        checked={isEmailActive}
-                        disabled={!isNotificationsActive}
-                        action={() =>
-                            toggleSpecificNotificationChannel(
-                                !isEmailActive,
-                                NotificationChannelType.EMAIL,
-                                setIsEmailActive,
-                            )
-                        }
-                        heading="Email"
-                    />
-                    {email && isNotificationsActive ? (
-                        <DeleteIcon
-                            data={email}
-                            type={NotificationChannelType.EMAIL}
-                            deleteNotification={setEmail}
-                        />
-                    ) : (
-                        <NotificationButton
-                            text="Add Email"
-                            disabled={!isNotificationsActive || !isEmailActive}
-                            action={() => {
-                                setActiveVerification(
+            {!disabledOptions.notification.email && (
+                <div className="notification-content-left mt-4">
+                    <div className="d-flex align-items-center">
+                        <Checkbox
+                            checked={isEmailActive}
+                            disabled={!isNotificationsActive}
+                            action={() =>
+                                toggleSpecificNotificationChannel(
+                                    !isEmailActive,
                                     NotificationChannelType.EMAIL,
-                                );
-                                setActiveVerificationContent(
-                                    getVerficationModalContent(
-                                        NotificationChannelType.EMAIL,
-                                        setActiveVerification,
-                                        setEmail,
-                                    ),
-                                );
-                            }}
+                                    setIsEmailActive,
+                                )
+                            }
+                            heading="Email"
                         />
-                    )}
+                        {email && isNotificationsActive ? (
+                            <DeleteIcon
+                                data={email}
+                                type={NotificationChannelType.EMAIL}
+                                deleteNotification={setEmail}
+                            />
+                        ) : (
+                            <NotificationButton
+                                text="Add Email"
+                                disabled={
+                                    !isNotificationsActive || !isEmailActive
+                                }
+                                action={() => {
+                                    setActiveVerification(
+                                        NotificationChannelType.EMAIL,
+                                    );
+                                    setActiveVerificationContent(
+                                        getVerficationModalContent(
+                                            NotificationChannelType.EMAIL,
+                                            setActiveVerification,
+                                            setEmail,
+                                        ),
+                                    );
+                                }}
+                            />
+                        )}
+                    </div>
+                    <Text
+                        disabled={!isNotificationsActive}
+                        text={
+                            'An email is sent to inform you that a message is waiting for you at a delivery service.'
+                        }
+                    />
+                    <span className="experimental-fun">
+                        Experimental function. Do not use in production!
+                    </span>
                 </div>
-                <Text
-                    disabled={!isNotificationsActive}
-                    text={
-                        'An email is sent to inform you that a message is waiting for you at a delivery service.'
-                    }
-                />
-                <span className="experimental-fun">
-                    Experimental function. Do not use in production!
-                </span>
-            </div>
+            )}
 
             {/* Mobile notifications enabled/disabled */}
             {/* <div className="notification-content-left mt-4">
@@ -179,22 +186,24 @@ export function Notification() {
             </div> */}
 
             {/* Push notifications enabled/disabled */}
-            <div className="notification-content-left mt-4">
-                <div className="d-flex align-items-center">
-                    <Checkbox
-                        checked={isPushNotifyActive}
+            {!disabledOptions.notification.push && (
+                <div className="notification-content-left mt-4">
+                    <div className="d-flex align-items-center">
+                        <Checkbox
+                            checked={isPushNotifyActive}
+                            disabled={!isNotificationsActive}
+                            action={() =>
+                                pushNotificationAction(!isPushNotifyActive)
+                            }
+                            heading="Push Notifications"
+                        />
+                    </div>
+                    <Text
                         disabled={!isNotificationsActive}
-                        action={() =>
-                            pushNotificationAction(!isPushNotifyActive)
-                        }
-                        heading="Push Notifications"
+                        text={'Enable push notifications to your browser.'}
                     />
                 </div>
-                <Text
-                    disabled={!isNotificationsActive}
-                    text={'Enable push notifications to your browser.'}
-                />
-            </div>
+            )}
         </div>
     );
 }

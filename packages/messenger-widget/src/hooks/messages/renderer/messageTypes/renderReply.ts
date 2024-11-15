@@ -6,7 +6,7 @@ export const renderReply = (messages: MessageModel[]) => {
             //TODO we've to figure out how to get a message from a different chunk (Alex)
             const replyToMessageEnvelop = messages.find(
                 (m) =>
-                    m.envelop.metadata?.encryptedMessageHash ===
+                    m.envelop.metadata?.messageHash ===
                     message.envelop.message.metadata.referenceMessageHash,
             );
             return {

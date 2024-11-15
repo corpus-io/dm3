@@ -37,4 +37,5 @@ export const publishProfile = async (
     });
     console.log('publishProfile Tx res', publishProfileTx);
     await publishProfileTx.wait();
+    return true;
 };

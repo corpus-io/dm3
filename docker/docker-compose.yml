@@ -25,7 +25,6 @@ services:
             - db
             - dm3-storage
         environment:
-            REDIS_URL: redis://db:6379
             SIGNING_PUBLIC_KEY: ${SIGNING_PUBLIC_KEY}
             SIGNING_PRIVATE_KEY: ${SIGNING_PRIVATE_KEY}
             ENCRYPTION_PUBLIC_KEY: ${ENCRYPTION_PUBLIC_KEY}
@@ -36,12 +35,6 @@ services:
             PORT: 8081
             LOG_LEVEL: 'debug'
             DATABASE_URL: ${DATABASE_URL}
-
-    db:
-        image: redis
-        restart: always
-        volumes:
-            - ${PERSISTENCE_DIRECTORY}/db/redis:/data
 
     dm3-storage:
         image: postgres:13

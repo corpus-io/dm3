@@ -10,6 +10,8 @@ const DEFAULT_DELIVERY_SERVICE_PROPERTIES: DeliveryServiceProperties = {
     //100Kb
     sizeLimit: 100000,
     notificationChannel: [],
+    metricsCollectionIntervalInSeconds: 60 * 60 * 24, // 1 day
+    metricsRetentionDurationInSeconds: 60 * 60 * 24 * 10, // 10 days
 };
 
 export function getDeliveryServiceProperties(

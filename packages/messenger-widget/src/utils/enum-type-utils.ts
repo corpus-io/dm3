@@ -33,3 +33,15 @@ export enum SiweValidityStatus {
     VALIDATED = 'VALIDATED',
     ERROR = 'ERROR',
 }
+
+export enum ProfileType {
+    DM3_NAME = 'dm3Name',
+    OWN_NAME = 'ownName',
+}
+
+export enum ProfileScreenType {
+    SELECT_TYPE,
+    SELECT_STORAGE,
+    CLAIM_NAME,
+    NONE,
+}

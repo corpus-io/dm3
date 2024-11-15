@@ -4,7 +4,7 @@ import {
     schema,
 } from '@dm3-org/dm3-lib-delivery';
 import { normalizeEnsName } from '@dm3-org/dm3-lib-profile';
-import { authorize } from '@dm3-org/dm3-lib-server-side';
+import { authorizationMiddleware } from '@dm3-org/dm3-lib-server-side';
 import { validateSchema } from '@dm3-org/dm3-lib-shared';
 import cors from 'cors';
 import { ethers } from 'ethers';
@@ -40,7 +40,7 @@ export default (
     //TODO remove
     router.use(cors());
     router.param('ensName', async (req, res, next, ensName: string) => {
-        authorize(
+        authorizationMiddleware(
             req,
             res,
             next,

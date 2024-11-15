@@ -4,8 +4,13 @@ import blueTickIcon from '../../assets/images/tick.svg';
 import whiteTickIcon from '../../assets/images/white-tick.svg';
 import { MessageProps } from '../../interfaces/props';
 import { MessageIndicator } from '../../hooks/messages/useMessage';
+import { useContext } from 'react';
+import { SettingsContext } from '../../context/SettingsContext';
+import { MsgViewType } from '../../hooks/settings/useSettings';
 
 export function MessageDetail(props: MessageProps) {
+    const { msgViewSelected } = useContext(SettingsContext);
+
     const getMessageIndicatorView = (
         indicator: MessageIndicator | undefined,
     ) => {
@@ -49,8 +54,10 @@ export function MessageDetail(props: MessageProps) {
             <span className="tick-icon readed-tick-icon">
                 {props.ownMessage ? (
                     getMessageIndicatorView(props.indicator)
-                ) : (
+                ) : msgViewSelected.viewType === MsgViewType.OLD ? (
                     <></>
+                ) : (
+                    getMessageIndicatorView(MessageIndicator.READED)
                 )}
             </span>
         </div>

@@ -22,7 +22,7 @@ export function syncAcknowledge(redis: Redis) {
 
         //find the message with the given hash
         const message = messages.find(
-            (m) => m.metadata.encryptedMessageHash === messageHash,
+            (m) => m.metadata.messageHash === messageHash,
         );
 
         //return if the message is not found

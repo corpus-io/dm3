@@ -1007,7 +1007,7 @@ describe('Storage', () => {
                 .send({
                     encryptedEnvelopContainer: JSON.stringify(envelop1),
                     encryptedContactName: sha256(receiver.account.ensName),
-                    messageId: envelop1.metadata.encryptedMessageHash,
+                    messageId: envelop1.metadata.messageHash,
                     createdAt: 1,
                     isHalted: true,
                 });
@@ -1119,6 +1119,75 @@ describe('Storage', () => {
                 .send({
                     encryptedContactName: sha256(receiver.account.ensName),
                     messageBatch: [
+                        {
+                            encryptedEnvelopContainer: JSON.stringify(envelop),
+                            messageId: '123',
+                            createdAt: 1,
+                            isHalted: false,
+                        },
+                        {
+                            encryptedEnvelopContainer: JSON.stringify(envelop),
+                            messageId: '456',
+                            createdAt: 2,
+                            isHalted: false,
+                        },
+                    ],
+                });
+            expect(status).toBe(200);
+
+            const { body } = await request(app)
+                .get(`/new/bob.eth/getConversations`)
+                .set({
+                    authorization: 'Bearer ' + token,
+                })
+                .send();
+
+            expect(status).toBe(200);
+            expect(body[0].contact).toEqual(sha256(receiver.account.ensName));
+            expect(body.length).toBe(1);
+
+            const { status: getMessagesStatus, body: messages } = await request(
+                app,
+            )
+                .get(
+                    `/new/bob.eth/getMessages/${sha256(
+                        receiver.account.ensName,
+                    )}`,
+                )
+                .set({
+                    authorization: 'Bearer ' + token,
+                })
+                .send();
+
+            expect(getMessagesStatus).toBe(200);
+            expect(messages.length).toBe(2);
+            expect(
+                JSON.parse(JSON.parse(messages[0]).encryptedEnvelopContainer),
+            ).toStrictEqual(envelop);
+        });
+        it('if batch contains duplicates it only creates the message once', async () => {
+            const messageFactory = MockMessageFactory(
+                sender,
+                receiver,
+                deliveryService,
+            );
+            const envelop = await messageFactory.createEncryptedEnvelop(
+                'Hello1',
+            );
+            const { status } = await request(app)
+                .post(`/new/bob.eth/addMessageBatch`)
+                .set({
+                    authorization: 'Bearer ' + token,
+                })
+                .send({
+                    encryptedContactName: sha256(receiver.account.ensName),
+                    messageBatch: [
+                        {
+                            encryptedEnvelopContainer: JSON.stringify(envelop),
+                            messageId: '123',
+                            createdAt: 1,
+                            isHalted: false,
+                        },
                         {
                             encryptedEnvelopContainer: JSON.stringify(envelop),
                             messageId: '123',

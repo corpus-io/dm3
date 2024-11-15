@@ -1,7 +1,7 @@
 {
   "name": "@dm3-org/dm3-integration-tests",
   "license": "BSD-2-Clause",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "dependencies": {
     "@dm3-org/dm3-lib-delivery": "workspace:^",
     "@dm3-org/dm3-lib-messaging": "workspace:^",

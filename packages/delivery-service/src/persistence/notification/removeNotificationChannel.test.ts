@@ -1,4 +1,3 @@
-import winston from 'winston';
 import { IDatabase, Redis, getDatabase, getRedisClient } from '../getDatabase';
 import {
     NotificationChannelType,
@@ -6,10 +5,6 @@ import {
 } from '@dm3-org/dm3-lib-shared';
 
 const USER_ADDRESS = '0x25A643B6e52864d0eD816F1E43c0CF49C83B8292';
-
-global.logger = winston.createLogger({
-    transports: [new winston.transports.Console()],
-});
 
 describe('Removes EMAIL notification channel', () => {
     let redisClient: Redis;

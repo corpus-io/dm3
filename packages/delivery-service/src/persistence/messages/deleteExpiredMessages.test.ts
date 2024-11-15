@@ -1,9 +1,4 @@
-import winston from 'winston';
 import { getDatabase, getRedisClient, IDatabase, Redis } from '../getDatabase';
-
-global.logger = winston.createLogger({
-    transports: [new winston.transports.Console()],
-});
 
 describe('Delete Expired messages', () => {
     let redisClient: Redis;
@@ -29,7 +24,7 @@ describe('Delete Expired messages', () => {
                 metadata: {
                     deliveryInformation: '',
                     signature: '',
-                    encryptedMessageHash: '',
+                    messageHash: '',
                     version: '',
                     encryptionScheme: 'x25519-chacha20-poly1305',
                 },
@@ -44,7 +39,7 @@ describe('Delete Expired messages', () => {
                 metadata: {
                     deliveryInformation: '',
                     signature: '',
-                    encryptedMessageHash: '',
+                    messageHash: '',
                     version: '',
                     encryptionScheme: 'x25519-chacha20-poly1305',
                 },
@@ -60,7 +55,7 @@ describe('Delete Expired messages', () => {
                 metadata: {
                     deliveryInformation: '',
                     signature: '',
-                    encryptedMessageHash: '',
+                    messageHash: '',
                     version: '',
                     encryptionScheme: 'x25519-chacha20-poly1305',
                 },
