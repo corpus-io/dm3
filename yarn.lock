@@ -2534,6 +2534,7 @@ __metadata:
     "@dm3-org/dm3-lib-test-helper": "workspace:^"
     "@emoji-mart/data": ^1.1.2
     "@emoji-mart/react": ^1.1.1
+    "@ensdomains/ensjs": ^2.1.0
     "@erc725/erc725.js": ^0.27.1
     "@popperjs/core": ^2.11.8
     "@rainbow-me/rainbowkit": ^1.0.6
