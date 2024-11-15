@@ -29,6 +29,7 @@ export function getIdForAddress(address: string, addrEnsSubdomain: string) {
 
 export interface Dm3SdkConfig {
     mainnetProvider: ethers.providers.JsonRpcProvider;
+    storageApi: StorageAPI;
     nonce: string;
     defaultDeliveryService: string;
     addressEnsSubdomain: string;

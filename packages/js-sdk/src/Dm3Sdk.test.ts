@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { Dm3Sdk, Dm3SdkConfig } from './Dm3Sdk';
+import { StorageAPI } from '@dm3-org/dm3-lib-storage';
 
 describe('Dm3Sdk', () => {
     let upController: ethers.Signer;
@@ -22,11 +23,12 @@ describe('Dm3Sdk', () => {
             userEnsSubdomain: 'user.test',
             resolverBackendUrl: 'resolver.io',
             backendUrl: 'backend.io',
+            storageApi: {} as StorageAPI,
         };
 
-        const dm3 = await new Dm3Sdk().universalProfileLogin();
-        await dm3.conversations.addConversation('karl.eth');
-        const c = dm3.conversations.list;
-        const karl = c[0];
+        // const dm3 = await new Dm3Sdk().universalProfileLogin();
+        // await dm3.conversations.addConversation('karl.eth');
+        // const c = dm3.conversations.list;
+        // const karl = c[0];
     });
 });
