@@ -111,7 +111,7 @@ export class SmartAccountConnector {
         );
         //For each device in the keyStore, encrypt the profileKeys of the controller
         //That only applies for controllers that have a publicKey but not encryptedProfileKeys yet
-        const newKeyStore: KeyStore.Dm3KeyStore = {};
+        const newKeyStore: KeyStore.IDm3KeyStore = {};
 
         for (const key of Object.keys(keyStore)) {
             const controller = keyStore[key];
@@ -350,7 +350,7 @@ export class SmartAccountConnector {
     // They are not.
     // Device2 starts the key transfer process, by:
     // Storing Device2 public key on an appropriate service
-    private async addNewSigner(keyStore: KeyStore.Dm3KeyStore) {
+    private async addNewSigner(keyStore: KeyStore.IDm3KeyStore) {
         const { encryptionKeyPair, signature } =
             await this.createEncryptionKeys();
 
@@ -398,7 +398,7 @@ export class SmartAccountConnector {
         );
         const encryptedProfileKeys = btoa(stringify(encryptedPayload));
 
-        const dm3KeyStore: KeyStore.Dm3KeyStore = {
+        const dm3KeyStore: KeyStore.IDm3KeyStore = {
             [upContollerAddress]: {
                 encryptedProfileKeys,
                 signerPublicKey: profileKeys.encryptionKeyPair.publicKey,

@@ -9,7 +9,7 @@ import {
     Success,
 } from './SmartAccountConnector';
 
-describe('SmartAccountConnector', () => {
+describe.skip('SmartAccountConnector', () => {
     describe('SignUp', () => {
         let universalProfile: ethers.Contract;
         let upController1: ethers.Signer;

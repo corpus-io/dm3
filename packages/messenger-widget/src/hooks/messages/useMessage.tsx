@@ -25,6 +25,7 @@ import { checkIfEnvelopAreInSizeLimit } from './sizeLimit/checkIfEnvelopIsInSize
 import { handleMessagesFromDeliveryService } from './sources/handleMessagesFromDeliveryService';
 import { handleMessagesFromStorage } from './sources/handleMessagesFromStorage';
 import { handleMessagesFromWebSocket } from './sources/handleMessagesFromWebSocket';
+import { Lukso } from '@dm3-org/dm3-lib-smart-account';
 
 const DEFAULT_MESSAGE_PAGESIZE = 100;
 
@@ -345,13 +346,6 @@ export const useMessage = () => {
         return { isSuccess: true };
     };
 
-    //Just for testing purposes
-    //TODO cleanup and find better solution
-    const isLuksoName = (input: string): boolean => {
-        const regex = /^[a-zA-Z0-9]+#[a-zA-Z0-9]{4}\.up$/;
-        return regex.test(input);
-    };
-
     const _dispatchMessage = async (
         contact: string,
         recipient: ContactPreview,
@@ -371,7 +365,7 @@ export const useMessage = () => {
                             to: {
                                 ...recipient!.contactDetails.account,
                                 //Cover edge case of lukso names. TODO discuss with the team and decide how to dela with non ENS names
-                                ensName: isLuksoName(recipient.name)
+                                ensName: Lukso.isLuksoName(recipient.name)
                                     ? recipient.contactDetails.account.ensName
                                     : recipient.name,
                             },

@@ -2,7 +2,7 @@ import { SignedUserProfile } from '@dm3-org/dm3-lib-profile';
 import { stringify } from '@dm3-org/dm3-lib-shared';
 import { ethers } from 'ethers';
 import {
-    Dm3KeyStore,
+    IDm3KeyStore,
     IKeyStoreService as IKeyStore,
 } from '../KeyStore/IKeyStore';
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js';
@@ -44,7 +44,7 @@ export class LuksoKeyStore implements IKeyStore {
         const { keys, values } = encoded;
         await this.upContract.setDataBatch([...keys], [...values]);
     }
-    async writeDm3KeyStore(keyStore: Dm3KeyStore): Promise<void> {
+    async writeDm3KeyStore(keyStore: IDm3KeyStore): Promise<void> {
         //Create a key for each address in the keyStore
         const encodeDataReturn = Object.keys(keyStore).map((a) => {
             return this.erc725JsonCoder.encodeDm3KeyStoreEntry(
@@ -60,7 +60,7 @@ export class LuksoKeyStore implements IKeyStore {
         await this.upContract.setDataBatch(keys, values);
     }
     async writeDm3KeyStoreAndUserProfile(
-        keyStore: Dm3KeyStore,
+        keyStore: IDm3KeyStore,
         userProfile: SignedUserProfile,
     ): Promise<void> {
         //encode keyStore
@@ -91,7 +91,7 @@ export class LuksoKeyStore implements IKeyStore {
             this.upContract.address,
         );
     }
-    async readDm3KeyStore(): Promise<Dm3KeyStore> {
+    async readDm3KeyStore(): Promise<IDm3KeyStore> {
         return await this.erc725JsonCoder.decodeDm3KeyStore();
     }
 }

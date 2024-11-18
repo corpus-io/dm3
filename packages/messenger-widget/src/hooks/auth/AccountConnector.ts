@@ -66,22 +66,6 @@ export const AccountConnector = (
         if (!onChainProfile) {
             return await connectOffchainAccount(address);
         }
-        /**
-         * We've to check wether the profile published on chain belongs to the address we're trying to connect
-         * For EOA that would simply work by checking if the profile sig matches the address linked to the profile
-         * For Smart contracts we've to implement an ERC-1271 check first
-         * See https://github.com/dm3-org/dm3/issues/1160
-         */
-        //First occurance users logs in with onchain profile
-        // const isProfileValid = await checkUserProfile(
-        //     mainnetProvider,
-        //     onChainProfile,
-        //     address,
-        // );
-
-        // if (!isProfileValid) {
-        //     throw Error('Profile signature is invalid');
-        // }
 
         return {
             userProfile: onChainProfile,

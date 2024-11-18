@@ -1,5 +1,5 @@
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js';
-import { Dm3KeyStore } from '../KeyStore/IKeyStore';
+import { IDm3KeyStore } from '../KeyStore/IKeyStore';
 import { EncodeDataReturn } from '@erc725/erc725.js/build/main/src/types';
 import { ethers } from 'ethers';
 import {
@@ -8,6 +8,7 @@ import {
 } from '@erc725/erc725.js/build/main/src/types/decodeData';
 import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json';
 import { SignedUserProfile } from '@dm3-org/dm3-lib-profile';
+import { isStringArray } from './utils/isStringArray';
 
 export class ERC725JsonCoder {
     public static readonly schemas: ERC725JSONSchema[] = [
@@ -96,7 +97,7 @@ export class ERC725JsonCoder {
             keyName: 'DM3UserProfile:<address>',
             dynamicKeyParts: upAddress,
         });
-        if (encodedUserProfile.value === null) {
+        if (!isStringArray(encodedUserProfile.value)) {
             return undefined;
         }
 
@@ -105,25 +106,22 @@ export class ERC725JsonCoder {
             publicEncryptionKey,
             deliveryServices,
             signature,
-        ] = encodedUserProfile.value as Data[];
+        ] = encodedUserProfile.value;
 
         return {
             profile: {
-                publicSigningKey: ethers.utils.toUtf8String(
-                    publicSigningKey as string,
-                ),
-                publicEncryptionKey: ethers.utils.toUtf8String(
-                    publicEncryptionKey as string,
-                ),
+                publicSigningKey: ethers.utils.toUtf8String(publicSigningKey),
+                publicEncryptionKey:
+                    ethers.utils.toUtf8String(publicEncryptionKey),
                 deliveryServices: JSON.parse(
-                    ethers.utils.toUtf8String(deliveryServices as string),
+                    ethers.utils.toUtf8String(deliveryServices),
                 ),
             },
-            signature: ethers.utils.toUtf8String(signature as string),
+            signature: ethers.utils.toUtf8String(signature),
         };
     }
 
-    public async decodeDm3KeyStore(): Promise<Dm3KeyStore> {
+    public async decodeDm3KeyStore(): Promise<IDm3KeyStore> {
         const controllerAddresses = await this.erc725.getData(
             'AddressPermissions[]',
         );
@@ -150,10 +148,8 @@ export class ERC725JsonCoder {
                 ),
             };
             return acc;
-        }, {} as Dm3KeyStore);
+        }, {} as IDm3KeyStore);
 
         return ks;
     }
 }
-//"0x89197c814f5df4249c180000c73abaa79d9d562d07f09d8135b72b047908bbe6"
-//"0x89197c814f5df4249c1800007870c5b8bc9572a8001c3f96f7ff59961b23500d"

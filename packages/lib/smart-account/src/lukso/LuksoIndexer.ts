@@ -21,7 +21,7 @@ export class LuksoIndexer {
 
     public async resolveAddress(address: string): Promise<string | undefined> {
         const query = gql`
-            query MyQuery {
+            query resolveAddress {
                 Profile(where: { id: { _ilike: "${address}" } }) {
                     fullName
                 }
@@ -39,7 +39,7 @@ export class LuksoIndexer {
         lsp3FullName: string,
     ): Promise<string | undefined> {
         const query = gql`
-            query MyQuery {
+            query resolveName {
                 search_profiles(args: { search: "${lsp3FullName}" }) {
                     id
                 }

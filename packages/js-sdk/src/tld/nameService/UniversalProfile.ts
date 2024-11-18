@@ -39,7 +39,7 @@ export class UniversalProfile implements ITLDResolver {
     ): Promise<string> {
         const [address] = ensName.split('.');
         const aliasName = await this.luksoIndexer.resolveAddress(address);
-        return aliasName! + '.up';
+        return `${aliasName}.up`;
     }
 
     //e.g. alexcv#d7ab.up => 0x1234.addr.dm3.eth
