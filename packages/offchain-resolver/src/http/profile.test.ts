@@ -42,6 +42,11 @@ describe('Profile', () => {
         },
     );
 
+    const luksoProvider: ethers.providers.JsonRpcProvider = {
+        //Make the otherwise empty object a valid Provider
+        _isProvider: true,
+    } as any;
+
     beforeEach(async () => {
         prismaClient = await getDbClient();
         db = await getDatabase(prismaClient);
@@ -72,7 +77,7 @@ describe('Profile', () => {
 
     describe('Create Alias', () => {
         it('Rejects if there is no Profile', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const { status, body } = await request(app)
                 .post(`/name`)
                 .send({
@@ -88,7 +93,7 @@ describe('Profile', () => {
         });
 
         it('Rejects invalid signature', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
 
             const offChainProfile1 = app.locals.forTests;
 
@@ -122,10 +127,13 @@ describe('Profile', () => {
 
         it('Rejects address with an empty eth balance', async () => {
             app.use(
-                profile({
-                    getBalance: async () => ethers.BigNumber.from(0),
-                    resolveName: async () => offChainProfile.signer,
-                } as any),
+                profile(
+                    {
+                        getBalance: async () => ethers.BigNumber.from(0),
+                        resolveName: async () => offChainProfile.signer,
+                    } as any,
+                    luksoProvider,
+                ),
             );
             const offChainProfile = app.locals.forTests;
             await request(app)
@@ -155,7 +163,7 @@ describe('Profile', () => {
         });
 
         it('Rejects if subdomain is already claimed', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const profile2: UserProfile = {
                 publicSigningKey: '',
                 publicEncryptionKey: '',
@@ -196,10 +204,13 @@ describe('Profile', () => {
             app2.use(bodyParser.json());
 
             app2.use(
-                profile({
-                    getBalance: async () => ethers.BigNumber.from(1),
-                    resolveName: async () => app.locals.forTests.signer,
-                } as any),
+                profile(
+                    {
+                        getBalance: async () => ethers.BigNumber.from(1),
+                        resolveName: async () => app.locals.forTests.signer,
+                    } as any,
+                    luksoProvider,
+                ),
             );
             app2.locals.config = { spamProtection: true };
             app2.locals.db = db;
@@ -222,7 +233,7 @@ describe('Profile', () => {
 
     describe('Store UserProfile by address', () => {
         it('Rejects invalid schema', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const { status, body } = await request(app).post(`/address`).send({
                 address: SENDER_ADDRESS,
                 signedUserProfile: {},
@@ -232,7 +243,7 @@ describe('Profile', () => {
             expect(body.error).to.equal('invalid schema');
         });
         it('Rejects invalid profile', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const userProfile: UserProfile = {
                 publicSigningKey:
                     '0ekgI3CBw2iXNXudRdBQHiOaMpG9bvq9Jse26dButug=',
@@ -260,8 +271,8 @@ describe('Profile', () => {
             expect(body.error).to.equal('invalid profile');
         });
 
-        it('Updates profile if subdomain has already a profile', async () => {
-            app.use(profile(provider));
+        it('Rejects if subdomain has already a profile', async () => {
+            app.use(profile(provider, luksoProvider));
 
             const offChainProfile1 = await getSignedUserProfile();
 
@@ -294,7 +305,7 @@ describe('Profile', () => {
             expect(res2.status).to.equal(200);
         });
         it('Rejects if subdomain is not supported', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
 
             const offChainProfile1 = await getSignedUserProfile();
 
@@ -331,7 +342,7 @@ describe('Profile', () => {
         });
 
         it('Stores a valid profile', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const {
                 signer,
                 profile: userProfile,
@@ -365,10 +376,13 @@ describe('Profile', () => {
             app.locals.config.spamProtection = false;
 
             app.use(
-                profile({
-                    ...provider,
-                    resolveName: async () => signer,
-                } as any),
+                profile(
+                    {
+                        ...provider,
+                        resolveName: async () => signer,
+                    } as any,
+                    luksoProvider,
+                ),
             );
 
             const writeRes = await request(app)
@@ -409,13 +423,13 @@ describe('Profile', () => {
     });
     describe('Get User By Account', () => {
         it('Returns 400 if address in invalid', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const { status, body } = await request(app).get(`/fooo`).send();
             expect(status).to.equal(400);
         });
 
         it('Returns 404 if profile does not exists', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const { status, body } = await request(app)
                 .get(`/${SENDER_ADDRESS}`)
                 .send();
@@ -423,7 +437,7 @@ describe('Profile', () => {
         });
 
         it('Rejcts invalid name subdomain', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const {
                 signer,
                 profile: userProfile,
@@ -460,7 +474,7 @@ describe('Profile', () => {
         });
 
         it('Returns the profile linked to ', async () => {
-            app.use(profile(provider));
+            app.use(profile(provider, luksoProvider));
             const {
                 signer,
                 profile: userProfile,

@@ -14,6 +14,7 @@ import {
 import { closeLoader, startLoader } from '../Loader/Loader';
 import './AddConversation.css';
 import { normalizeEnsName } from '@dm3-org/dm3-lib-profile';
+import { Lukso } from '@dm3-org/dm3-lib-smart-account';
 
 // class for input field
 export const INPUT_FIELD_CLASS =
@@ -96,7 +97,11 @@ export default function AddConversation() {
         setErrorMsg('');
         setShowError(false);
         setTldName(e.target.value);
-        if (!ethers.utils.isValidName(e.target.value)) {
+
+        if (
+            !ethers.utils.isValidName(e.target.value) &&
+            !Lukso.isLuksoName(e.target.value)
+        ) {
             setErrorMsg('Invalid address or ENS name');
             setShowError(true);
         }

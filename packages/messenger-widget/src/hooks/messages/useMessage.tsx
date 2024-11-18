@@ -25,6 +25,7 @@ import { checkIfEnvelopAreInSizeLimit } from './sizeLimit/checkIfEnvelopIsInSize
 import { handleMessagesFromDeliveryService } from './sources/handleMessagesFromDeliveryService';
 import { handleMessagesFromStorage } from './sources/handleMessagesFromStorage';
 import { handleMessagesFromWebSocket } from './sources/handleMessagesFromWebSocket';
+import { Lukso } from '@dm3-org/dm3-lib-smart-account';
 
 const DEFAULT_MESSAGE_PAGESIZE = 100;
 
@@ -363,7 +364,10 @@ export const useMessage = () => {
                             from: account!,
                             to: {
                                 ...recipient!.contactDetails.account,
-                                ensName: recipient.name,
+                                //Cover edge case of lukso names. TODO discuss with the team and decide how to dela with non ENS names
+                                ensName: Lukso.isLuksoName(recipient.name)
+                                    ? recipient.contactDetails.account.ensName
+                                    : recipient.name,
                             },
                             deliverServiceProfile,
                             keys: profileKeys!,

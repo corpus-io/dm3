@@ -33,3 +33,4 @@ export {
 } from './deliveryServiceProfile/Delivery';
 export * from './profileKeys/createProfileKeys';
 export * from './profileLink';
+export * from './profileValidator/ProfileValidator';

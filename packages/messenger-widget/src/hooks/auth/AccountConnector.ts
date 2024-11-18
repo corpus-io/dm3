@@ -66,18 +66,6 @@ export const AccountConnector = (
         if (!onChainProfile) {
             return await connectOffchainAccount(address);
         }
-        /**
-         * We've to check wether the profile published on chain belongs to the address we're trying to connectÌ
-         */
-        const isProfileValid = await checkUserProfile(
-            mainnetProvider,
-            onChainProfile,
-            address,
-        );
-
-        if (!isProfileValid) {
-            throw Error('Profile signature is invalid');
-        }
 
         return {
             userProfile: onChainProfile,

@@ -80,8 +80,14 @@ export async function getUserProfile(
         .find((r) => r.isProfile(textRecord))
         ?.resolveProfile(textRecord);
 
-    if (profile && !(await checkUserProfile(provider, profile, contact))) {
-        throw Error(`Couldn't verify user profile`);
+    //Second occurance of checkUserProfile is the check of pthers profiles
+    // if (profile && !(await checkUserProfile(provider, profile, contact))) {
+    //     throw Error(`Couldn't verify user profile`);
+    // }
+
+    if (!profile) {
+        console.log('unable to fetch user profile for ', contact);
+        return undefined;
     }
 
     return profile;

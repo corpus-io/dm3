@@ -31,6 +31,7 @@ services:
             ENCRYPTION_PRIVATE_KEY: ${ENCRYPTION_PRIVATE_KEY}
             DISABLE_SESSION_CHECK: ${DISABLE_SESSION_CHECK}
             RPC: ${RPC}
+            LUKSO_RPC: ${LUKSO_RPC}
             PORT: 8081
             LOG_LEVEL: 'debug'
             DATABASE_URL: ${DATABASE_URL}
@@ -58,6 +59,7 @@ services:
             ENCRYPTION_PUBLIC_KEY: ${ENCRYPTION_PUBLIC_KEY}
             ENCRYPTION_PRIVATE_KEY: ${ENCRYPTION_PRIVATE_KEY}
             RPC: ${RPC}
+            LUKSO_RPC: ${LUKSO_RPC}
             PORT: 8083
             LOG_LEVEL: 'debug'
         volumes:
@@ -88,6 +90,7 @@ services:
             DATABASE_URL: postgresql://postgres:example@offchain-resolver-db:5432
             PORT: 8082
             RPC: ${RPC}
+            LUKSO_RPC: ${LUKSO_RPC}
             RESOLVER_SUPPORTED_ADDR_ENS_SUBDOMAINS: ${RESOLVER_SUPPORTED_ADDR_ENS_SUBDOMAINS}
             RESOLVER_SUPPORTED_NAME_ENS_SUBDOMAINS: ${RESOLVER_SUPPORTED_NAME_ENS_SUBDOMAINS}
             LOG_LEVEL: 'debug'

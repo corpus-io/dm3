@@ -1,3 +1,4 @@
+import { lukso } from 'viem/chains';
 import { AuthContextType } from '../AuthContext';
 
 //Provide a mocked Authenticate context
@@ -11,6 +12,7 @@ export const getMockedAuthContext = (override?: Partial<AuthContextType>) => {
             throw new Error('Function not implemented.');
         },
         setDisplayName: () => {},
+        luksoSignIn: async () => {},
         account: undefined,
         displayName: undefined,
         isProfileReady: false,

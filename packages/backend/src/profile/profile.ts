@@ -1,5 +1,9 @@
 import { generateAuthJWT } from '@dm3-org/dm3-lib-server-side';
-import { getUserProfile } from '@dm3-org/dm3-lib-profile';
+import {
+    getUserProfile,
+    ProfileValidator,
+    SignedUserProfile,
+} from '@dm3-org/dm3-lib-profile';
 
 import {
     checkUserProfile,
@@ -14,6 +18,7 @@ import { IBackendDatabase } from '../persistence/getDatabase';
 export default (
     db: IBackendDatabase,
     web3Provider: ethers.providers.JsonRpcProvider,
+    luksoProvider: ethers.providers.JsonRpcProvider,
     serverSecret: string,
 ) => {
     const router = express.Router();
@@ -60,6 +65,7 @@ export default (
             if (
                 !(await checkUserProfile(
                     web3Provider,
+                    luksoProvider,
                     req.body, // as SignedUserProfile,
                     normalizeEnsName(ensName),
                 ))

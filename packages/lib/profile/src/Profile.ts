@@ -10,6 +10,7 @@ import queryString from 'query-string';
 import { Dm3Profile } from './profileResolver/ProfileResolver';
 import { createProfileKeys } from './profileKeys/createProfileKeys';
 import { SignedUserProfile, UserProfile } from './types';
+import { ProfileValidator } from './profileValidator/ProfileValidator';
 
 export const DEFAULT_NONCE = ethers.utils.sha256(
     ethers.utils.toUtf8Bytes('dm3_default_nonce'),
@@ -108,16 +109,24 @@ export function getAccountDisplayName(
  */
 export async function checkUserProfile(
     provider: ethers.providers.JsonRpcProvider,
-    { profile, signature }: SignedUserProfile,
+    luksoProvider: ethers.providers.JsonRpcProvider,
+    signedUserProfile: SignedUserProfile,
     ensName: string,
 ): Promise<boolean> {
     const accountAddress = await provider.resolveName(ensName);
 
     if (!accountAddress) {
-        throw Error(`Couldn't resolve name`);
+        throw Error(`Couldn't resolve address for ${ensName}`);
     }
     //ensures that the profile has been signed by the owner of the ENS name to prevent impersonation
-    return checkUserProfileWithAddress({ profile, signature }, accountAddress);
+    const isValidProfile = await new ProfileValidator(luksoProvider).validate(
+        signedUserProfile as SignedUserProfile,
+        accountAddress,
+    );
+
+    return isValidProfile;
+
+    //return checkUserProfileWithAddress({ profile, signature }, accountAddress);
 }
 
 /**

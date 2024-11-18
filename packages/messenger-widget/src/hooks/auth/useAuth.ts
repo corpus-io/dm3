@@ -23,8 +23,9 @@ import { ModalContext } from '../../context/ModalContext';
 import { TLDContext } from '../../context/TLDContext';
 import { UiViewContext } from '../../context/UiViewContext';
 import { useMainnetProvider } from '../mainnetprovider/useMainnetProvider';
-import { AccountConnector, getIdForAddress } from './AccountConnector';
 import { SignMessageFn } from '../server-side/ServerSideConnector';
+import { AccountConnector, getIdForAddress } from './AccountConnector';
+import { LuksoConnector } from './lukso/LuksoConnector';
 
 export const useAuth = () => {
     const mainnetProvider = useMainnetProvider();
@@ -133,6 +134,25 @@ export const useAuth = () => {
         );
         closeLoader();
     };
+
+    const luksoSignIn = async () => {
+        const lc = await LuksoConnector._instance(dm3Configuration);
+        const res = await lc.login();
+
+        if (res.type === 'SUCCESS') {
+            const { profile, profileKeys, controllerAddress, accountAddress } =
+                res;
+
+            const ensName = getIdForAddress(
+                accountAddress,
+                dm3Configuration.addressEnsSubdomain,
+            );
+            _setAccount(ensName, accountAddress, profile, profileKeys);
+            return;
+        }
+
+        throw Error('Login failed UNIMPLEMENTED!');
+    };
     const _login = async (
         ensName: string,
         address: string,
@@ -190,6 +210,16 @@ export const useAuth = () => {
         const signedUserProfile =
             _signedUserProfile ?? (await createNewSignedUserProfile(keys));
 
+        //Update the state with the new account
+        _setAccount(ensName, address, signedUserProfile, keys);
+    };
+
+    const _setAccount = (
+        ensName: string,
+        address: string,
+        signedUserProfile: SignedUserProfile,
+        profileKeys: ProfileKeys,
+    ) => {
         setAccount({
             ...account,
             ensName: normalizeEnsName(ensName),
@@ -199,7 +229,7 @@ export const useAuth = () => {
 
         setEthAddress(address);
         setIsLoading(false);
-        setProfileKeys(keys);
+        setProfileKeys(profileKeys);
     };
 
     const resetStates = () => {
@@ -210,6 +240,7 @@ export const useAuth = () => {
     return {
         profileKeys,
         cleanSignIn,
+        luksoSignIn,
         siweSignIn,
         setDisplayName,
         account,

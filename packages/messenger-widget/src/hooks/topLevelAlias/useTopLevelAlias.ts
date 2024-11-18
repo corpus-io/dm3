@@ -10,6 +10,7 @@ import { OptimismNames } from './nameService/OptimismNames';
 import { DM3Configuration } from '../../interfaces/config';
 import { ITLDResolver } from './nameService/ITLDResolver';
 import { ForeignName } from './nameService/ForeignName';
+import { UniversalProfile } from './nameService/UniversalProfile';
 import { normalizeEnsName } from '@dm3-org/dm3-lib-profile';
 
 const SUPPORTED_NAMESERVICES = (
@@ -21,6 +22,7 @@ const SUPPORTED_NAMESERVICES = (
     }: DM3Configuration,
 ): ITLDResolver[] => [
     new EthereumNameService(provider, addressEnsSubdomain, userEnsSubdomain),
+    new UniversalProfile(addressEnsSubdomain),
     new Genome(provider, addressEnsSubdomain),
     new OptimismNames(provider, addressEnsSubdomain),
     new ForeignName(provider, addressEnsSubdomain),

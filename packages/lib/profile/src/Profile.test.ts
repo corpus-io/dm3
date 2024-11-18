@@ -165,6 +165,9 @@ describe('Account', () => {
                     {
                         resolveName: async () => profile.address,
                     } as any,
+                    {
+                        _isProvider: true,
+                    } as any,
 
                     {
                         profile: profile.account.profile!,
@@ -183,6 +186,9 @@ describe('Account', () => {
                 await checkUserProfile(
                     {
                         resolveName: async () => profile.address,
+                    } as any,
+                    {
+                        _isProvider: true,
                     } as any,
                     {
                         profile: {
@@ -273,6 +279,9 @@ describe('Account', () => {
                     {
                         resolveName: async () => profile.address,
                     } as any,
+                    {
+                        _isProvider: true,
+                    } as any,
                     profile.signedUserProfile,
                     profile.account.ensName,
                 ),
@@ -285,6 +294,9 @@ describe('Account', () => {
                 await checkUserProfile(
                     {
                         resolveName: async () => profile.address,
+                    } as any,
+                    {
+                        _isProvider: true,
                     } as any,
                     {
                         profile: {

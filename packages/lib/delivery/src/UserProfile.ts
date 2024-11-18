@@ -1,4 +1,5 @@
 import {
+    ProfileValidator,
     SignedUserProfile,
     checkUserProfileWithAddress,
     getDefaultProfileExtension,
@@ -10,6 +11,7 @@ import { generateAuthJWT } from '@dm3-org/dm3-lib-server-side';
 import { Account } from './Account';
 
 export async function submitUserProfile(
+    luksoProvider: ethers.providers.BaseProvider,
     getAccount: (accountAddress: string) => Promise<Account | null>,
     setAccount: (accountAddress: string, account: Account) => Promise<void>,
     address: string,
@@ -23,9 +25,15 @@ export async function submitUserProfile(
     //normalize the address
     const _address = ethers.utils.getAddress(address);
     //     check if the submitted profile is has been signed by the adddress that want's to submit the profile
-    if (!(await checkUserProfileWithAddress(signedUserProfile, _address))) {
-        logDebug('submitUserProfile - Signature invalid');
-        throw Error('Signature invalid.');
+
+    const isValidProfile = await new ProfileValidator(luksoProvider).validate(
+        signedUserProfile,
+        _address,
+    );
+
+    if (!isValidProfile) {
+        console.error({ signedUserProfile, _address });
+        throw Error('submit user profile failed - invalid profile');
     }
     const account: Account = {
         account: _address,

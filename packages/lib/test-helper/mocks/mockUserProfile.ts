@@ -29,6 +29,7 @@ export const mockUserProfile = async (
     wallet: ethers.Wallet,
     ensName: string,
     deliveryServices: string[],
+    nonce: string = DEFAULT_NONCE,
 ): Promise<MockedUserProfile> => {
     const storageKeyCreationMessage = getStorageKeyCreationMessage(
         DEFAULT_NONCE,

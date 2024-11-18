@@ -3,6 +3,7 @@ import {
     Authenticate,
     errorHandler,
     getCachedWebProvider,
+    getLuksoProvider,
     getServerSecret,
     logError,
     logRequest,
@@ -22,13 +23,13 @@ import { startCleanUpPendingMessagesJob } from './cleanup/cleanUpPendingMessages
 import { getDeliveryServiceProperties } from './config/getDeliveryServiceProperties';
 import Delivery from './delivery';
 import { onConnection } from './messaging';
+import Metrics from './metrics';
 import Notifications from './notifications';
 import { IDatabase, getDatabase } from './persistence/getDatabase';
 import { Profile } from './profile/profile';
 import RpcProxy from './rpc/rpc-proxy';
-import { WebSocketManager } from './ws/WebSocketManager';
 import { socketAuth } from './socketAuth';
-import Metrics from './metrics';
+import { WebSocketManager } from './ws/WebSocketManager';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -96,6 +97,7 @@ app.use(bodyParser.json());
     // load environment
     const deliveryServiceProperties = getDeliveryServiceProperties();
     const web3Provider = await getCachedWebProvider(process.env);
+    const luksoProvider = await getLuksoProvider(process.env);
 
     const db = getDbWithAddressResolvedGetAccount(
         await getDatabase(),
@@ -142,7 +144,7 @@ app.use(bodyParser.json());
 
     app.use('/metrics', Metrics(db, deliveryServiceProperties));
     app.use('/auth', Authenticate(db, serverSecret, web3Provider));
-    app.use('/profile', Profile(db, web3Provider, serverSecret));
+    app.use('/profile', Profile(db, web3Provider, luksoProvider, serverSecret));
     app.use('/delivery', Delivery(web3Provider, db, serverSecret));
     app.use(
         '/notifications',

@@ -42,7 +42,9 @@ describe('Resolver Endpoint', () => {
             resolveName: async () => profileApp.locals.forTests.signer,
         };
 
-        profileApp.use(profile(provider));
+        const luksoProvider: ethers.providers.JsonRpcProvider = {} as any;
+
+        profileApp.use(profile(provider, luksoProvider));
         profileApp.locals.db = db;
         profileApp.locals.config = { spamProtection: true };
     });

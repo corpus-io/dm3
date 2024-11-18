@@ -5,6 +5,7 @@ import {
     getServerSecret,
     logError,
     logRequest,
+    getLuksoProvider,
 } from '@dm3-org/dm3-lib-server-side';
 import { logInfo } from '@dm3-org/dm3-lib-shared';
 import bodyParser from 'body-parser';
@@ -30,6 +31,7 @@ app.use(bodyParser.json());
 (async () => {
     const db = await getDatabase();
     const web3Provider = await getCachedWebProvider(process.env);
+    const luksoProvider = await getLuksoProvider(process.env);
     const serverSecret = getServerSecret(process.env);
 
     app.use(logRequest);
@@ -37,7 +39,7 @@ app.use(bodyParser.json());
     app.get('/hello', (req, res) => {
         return res.status(200).send('Hello DM3');
     });
-    app.use('/profile', Profile(db, web3Provider, serverSecret));
+    app.use('/profile', Profile(db, web3Provider, luksoProvider, serverSecret));
     app.use('/storage', Storage(db, web3Provider, serverSecret));
     app.use('/auth', Authenticate(db, serverSecret, web3Provider));
     app.use(logError);

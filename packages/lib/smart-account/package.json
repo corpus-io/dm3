@@ -1,0 +1,39 @@
+{
+  "name": "@dm3-org/dm3-lib-smart-account",
+  "license": "BSD-2-Clause",
+  "version": "1.6.0",
+  "main": "dist/index.js",
+  "module": "dist-backend/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/ethersHelper": {
+      "import": "./dist/ethersHelper.js",
+      "require": "./dist/ethersHelper.js"
+    }
+  },
+  "dependencies": {
+    "@apollo/client": "^3.11.5",
+    "@dm3-org/dm3-lib-profile": "workspace:^",
+    "@dm3-org/dm3-lib-shared": "workspace:^",
+    "@erc725/erc725.js": "^0.27.1",
+    "ethers": "5.7.2",
+    "graphql": "^15.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.4",
+    "typescript": "^4.4.2"
+  },
+  "scripts": {
+    "build": "yarn tsc --declaration  --declarationMap",
+    "test": "jest --coverage --transformIgnorePatterns 'node_modules/(?!(dm3-lib-\\w*)/)'"
+  },
+  "files": [
+    "dist"
+  ],
+  "publish": true
+}

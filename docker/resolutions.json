@@ -10,6 +10,7 @@
     "@dm3-org/dm3-lib-shared": "file:/library_archives/lib-shared.tgz",
     "@dm3-org/dm3-lib-storage": "file:/library_archives/lib-storage.tgz",
     "@dm3-org/dm3-lib-test-helper": "file:/library_archives/lib-test-helper.tgz",
+    "@dm3-org/dm3-lib-smart-account": "file:/library_archives/lib-smart-account.tgz",
     "@dm3-org/dm3-messenger-widget": "file:/library_archives/messenger-widget.tgz"
   }
 }

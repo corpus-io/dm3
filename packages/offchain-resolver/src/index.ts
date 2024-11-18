@@ -6,6 +6,7 @@ import http from 'http';
 import { resolverEndpoint } from './http/resolverEndpoint';
 import { getDatabase } from './persistence/getDatabase';
 import { getWeb3Provider } from './utils/getWeb3Provider';
+import { getLuksoProvider } from './utils/getLuksoProvider';
 
 import { profile } from './http/profile';
 
@@ -29,7 +30,7 @@ app.use(bodyParser.json());
     };
 
     app.use('/', resolverEndpoint());
-    app.use('/profile', profile(getWeb3Provider()));
+    app.use('/profile', profile(getWeb3Provider(), getLuksoProvider()));
 })();
 const port = process.env.PORT || '8081';
 server.listen(port, () => {

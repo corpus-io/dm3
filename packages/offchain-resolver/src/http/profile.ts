@@ -1,13 +1,20 @@
 import { checkSignature } from '@dm3-org/dm3-lib-crypto';
-import { checkUserProfileWithAddress, schema } from '@dm3-org/dm3-lib-profile';
-import { globalConfig, validateSchema } from '@dm3-org/dm3-lib-shared';
+import {
+    checkUserProfileWithAddress,
+    schema,
+    ProfileValidator,
+} from '@dm3-org/dm3-lib-profile';
+import { validateSchema } from '@dm3-org/dm3-lib-shared';
 import { ethers } from 'ethers';
 import express from 'express';
 import { SiweMessage } from 'siwe';
 import { SubdomainManager } from './subdomainManager/SubdomainManager';
 import { WithLocals } from './types';
 
-export function profile(web3Provider: ethers.providers.BaseProvider) {
+export function profile(
+    web3Provider: ethers.providers.BaseProvider,
+    luksoProvider: ethers.providers.BaseProvider,
+) {
     const router = express.Router();
     //subdomain manager for address domains
     const addressSubdomainManager = new SubdomainManager(
@@ -257,13 +264,17 @@ export function profile(web3Provider: ethers.providers.BaseProvider) {
                     return res.status(400).send({ error: 'invalid schema' });
                 }
 
-                const profileIsValid = checkUserProfileWithAddress(
-                    signedUserProfile,
-                    address,
-                );
+                //Check if the profile was signed by the owner of the address or an UP
+                const profileIsValid = await new ProfileValidator(
+                    luksoProvider,
+                ).validate(signedUserProfile, address);
+
+                //add check for lukso
 
                 //Check if profile sig is correcet
                 if (!profileIsValid) {
+                    console.error('profile signature invalid');
+                    console.error(signedUserProfile, address);
                     return res.status(400).send({ error: 'invalid profile' });
                 }
 

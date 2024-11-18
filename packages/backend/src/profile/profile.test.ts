@@ -29,10 +29,11 @@ const setUpApp = async (
     db: IBackendDatabase,
     web3Provider: ethers.providers.JsonRpcProvider,
     serverSecret: string = 'my-secret',
+    luksoProvider: ethers.providers.JsonRpcProvider = {} as ethers.providers.JsonRpcProvider,
 ) => {
     app.use(bodyParser.json());
     const server = http.createServer(app);
-    app.use(profile(db, web3Provider, serverSecret));
+    app.use(profile(db, web3Provider, luksoProvider, serverSecret));
 };
 
 const createDbMock = async () => {

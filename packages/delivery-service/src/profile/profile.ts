@@ -8,6 +8,7 @@ import { IDatabase } from '../persistence/getDatabase';
 export const Profile = (
     db: IDatabase,
     web3Provider: ethers.providers.JsonRpcProvider,
+    luksoProvider: ethers.providers.JsonRpcProvider,
     serverSecret: string,
 ) => {
     const router = express.Router();
@@ -69,6 +70,7 @@ export const Profile = (
             );
 
             const data = await submitUserProfile(
+                luksoProvider,
                 db.getAccount,
                 db.setAccount,
                 //use normalized address

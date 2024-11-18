@@ -46,16 +46,22 @@ describe('UserProfile', () => {
             const getAccount = () => Promise.resolve(null);
 
             const singedUserProfile = await signProfile(emptyProfile);
+            const luksoProvider = {
+                _isProvider: true,
+            } as ethers.providers.BaseProvider;
 
             await expect(async () => {
                 await submitUserProfile(
+                    luksoProvider,
                     getAccount,
                     setAccount,
                     RANDO_ADDRESS,
                     singedUserProfile,
                     'my-secret',
                 );
-            }).rejects.toEqual(Error('Signature invalid.'));
+            }).rejects.toEqual(
+                Error('submit user profile failed - invalid profile'),
+            );
             expect(setAccount).not.toBeCalled();
         });
 
@@ -85,7 +91,10 @@ describe('UserProfile', () => {
 
             const singedUserProfile = await signProfile(emptyProfile);
 
+            const luksoProvider = {} as ethers.providers.BaseProvider;
+
             await submitUserProfile(
+                luksoProvider,
                 getAccount,
                 setAccount,
                 SENDER_ADDRESS,
@@ -95,6 +104,7 @@ describe('UserProfile', () => {
 
             await expect(async () => {
                 await submitUserProfile(
+                    luksoProvider,
                     getAccount,
                     setAccount,
                     SENDER_ADDRESS,
@@ -110,7 +120,10 @@ describe('UserProfile', () => {
 
             const singedUserProfile = await signProfile(emptyProfile);
 
+            const luksoProvider = {} as ethers.providers.BaseProvider;
+
             await submitUserProfile(
+                luksoProvider,
                 getAccount,
                 setAccount,
                 SENDER_ADDRESS,
