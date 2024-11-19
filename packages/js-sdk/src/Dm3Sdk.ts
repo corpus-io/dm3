@@ -78,29 +78,27 @@ export class Dm3Sdk {
         this.addressEnsSubdomain = config.addressEnsSubdomain;
         this.userEnsSubdomain = config.userEnsSubdomain;
         this.resolverBackendUrl = config.resolverBackendUrl;
-        //this.backendUrl = config.backendUrl;
-        this.lukso = config.lukso;
+        this.backendUrl = config.backendUrl;
         this.storageApi = config.storageApi;
     }
-
-    public async universalProfileLogin() {
-        if (!this.lukso) {
-            throw new Error('Lukso provider not found');
-        }
+    /**
+     * login can be used to login with a profile regardles the connector. Its also great for testing
+     */
+    public async login({
+        profileKeys,
+        profile,
+        accountAddress,
+    }: {
+        profileKeys: ProfileKeys;
+        profile: SignedUserProfile;
+        accountAddress: string;
+    }) {
         const tld = new Tld(
             this.mainnetProvider,
             this.addressEnsSubdomain,
             this.userEnsSubdomain,
             this.resolverBackendUrl,
         );
-        const lc = await LuksoConnector._instance(
-            this.lukso,
-            this.nonce,
-            this.defaultDeliveryService,
-        );
-        const loginResult = await lc.login();
-
-        const { profileKeys, profile, accountAddress } = loginResult as Success;
 
         this.profileKeys = profileKeys;
         this.profile = profile;
@@ -140,6 +138,22 @@ export class Dm3Sdk {
         ).getCloudStorage();
 
         return new Dm3(conversations, tld);
+    }
+
+    //TODO use type of injected lukso provider
+    public async universalProfileLogin(lukso: any) {
+        if (!lukso) {
+            throw new Error('Lukso provider not found');
+        }
+        const lc = await LuksoConnector._instance(
+            lukso,
+            this.nonce,
+            this.defaultDeliveryService,
+        );
+        const loginResult = await lc.login();
+
+        const { profileKeys, profile, accountAddress } = loginResult as Success;
+        return await this.login({ profileKeys, profile, accountAddress });
     }
 
     private async initializeBackendConnector(
