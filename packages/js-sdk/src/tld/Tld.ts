@@ -27,7 +27,7 @@ const SUPPORTED_NAMESERVICES = (
     new EthAddressResolver(addressEnsSubdomain),
 ];
 
-export class Tld {
+export class Tld implements ITLDResolver {
     private aliasTldCache: { [ensName: string]: string };
     private tldAliasCache: { [ensName: string]: string };
     private readonly mainnetProvider: ethers.providers.JsonRpcProvider;
@@ -47,6 +47,17 @@ export class Tld {
         this.addressEnsSubdomain = addressEnsSubdomain;
         this.userEnsSubdomain = userEnsSubdomain;
         this.resolverBackendUrl = resolverBackendUrl;
+    }
+    isResolverForTldName(ensName: string): Promise<boolean> {
+        //Since its the root resolver its always capable of resolving
+        return Promise.resolve(true);
+    }
+    isResolverForAliasName(
+        ensName: string,
+        foreignTldName?: string,
+    ): Promise<boolean> {
+        //Since its the root resolver its always capable of resolving
+        return Promise.resolve(true);
     }
     //e.g. 0x1234.gnosis.eth -> 0x1234.gno
     resolveAliasToTLD = async (ensName: string, foreignTldName?: string) => {

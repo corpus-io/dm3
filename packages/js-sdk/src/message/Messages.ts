@@ -77,7 +77,7 @@ export class Messages {
         }
 
         //Find the recipient of the message in the contact list
-        const recipient = this.conversations.conversations.find(
+        const recipient = this.conversations.list.find(
             (c) => c.contact.account.ensName === contact,
         );
         /**
@@ -99,7 +99,7 @@ export class Messages {
         //There are cases were a messages is already to be send even though the contract hydration is not finished yet.
         //This happens if a message has been picked up from the delivery service and the clients sends READ_RECEIVE or READ_OPENED acknowledgements
         //In that case we've to check again to the if the user is a DM3 user, before we decide to keep the message
-        const potentialReceiver = this.conversations.conversations.find(
+        const potentialReceiver = this.conversations.list.find(
             (c) => c.contact.account.ensName === contact,
         );
 

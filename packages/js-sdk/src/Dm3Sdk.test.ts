@@ -9,9 +9,11 @@ import { Dm3Sdk, Dm3SdkConfig } from './Dm3Sdk';
 
 import MockAdapter from 'axios-mock-adapter';
 import { normalizeEnsName } from '@dm3-org/dm3-lib-profile';
+import { ITLDResolver } from './tld/nameService/ITLDResolver';
 
 describe('Dm3Sdk', () => {
     let alice: MockedUserProfile;
+    let bob: MockedUserProfile;
 
     //Axios mock to mock the http requests
     let axiosMock;
@@ -22,9 +24,12 @@ describe('Dm3Sdk', () => {
             'alice.up',
             ['test.io'],
         );
+        bob = await mockUserProfile(ethers.Wallet.createRandom(), 'bob.up', [
+            'test.io',
+        ]);
     });
 
-    it('test', async () => {
+    it('can add a conversaton to the contact list', async () => {
         axiosMock = new MockAdapter(axios);
         //Mock BackendConnector HttpRequests
         //Mock profileExistsOnDeliveryService
@@ -52,15 +57,24 @@ describe('Dm3Sdk', () => {
             )
             .reply(200, 'mock-challenge');
 
+        const mockTldResolver = {
+            resolveTLDtoAlias: async () =>
+                `${normalizeEnsName(bob.address)}.addr.test`,
+            resolveAliasToTLD: async () => 'bob.eth',
+        } as unknown as ITLDResolver;
+
         const mockConfig: Dm3SdkConfig = {
             mainnetProvider: {} as ethers.providers.JsonRpcProvider,
-            storageApi: {} as StorageAPI,
+            storageApi: {
+                addConversation: async () => {},
+            } as unknown as StorageAPI,
             nonce: '1',
             defaultDeliveryService: 'test.io',
             addressEnsSubdomain: '.addr.test',
             userEnsSubdomain: '.user.test',
             resolverBackendUrl: 'resolver.io',
             backendUrl: 'http://localhost:4060',
+            _tld: mockTldResolver,
         };
 
         const dm3 = await new Dm3Sdk(mockConfig).login({
@@ -69,10 +83,10 @@ describe('Dm3Sdk', () => {
             accountAddress: alice.address,
         });
 
-        console.log(dm3.conversations.conversations);
-
-        /*      await dm3.conversations.addConversation('karl.eth');
-        const c = dm3.conversations.conversations;
-        const karl = c[0]; */
+        await dm3.conversations.addConversation('bob.eth');
+        const c = dm3.conversations.list;
+        console.log(c);
+        expect(c.length).toBe(1);
+        expect(c[0].contact.name).toBe('bob.eth');
     });
 });

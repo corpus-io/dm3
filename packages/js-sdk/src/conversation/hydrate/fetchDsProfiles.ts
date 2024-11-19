@@ -18,9 +18,9 @@ export const fetchDsProfiles = async (
 ): Promise<FetchDsProfilesResult> => {
     const deliveryServiceEnsNames = account.profile?.deliveryServices ?? [];
     if (deliveryServiceEnsNames.length === 0) {
-        //If there is nop DS profile the message will be storaged at the client side until they recipient has createed an account
+        //If there is no DS profile the message will be stored at the client side until the recipient has created an account
         console.debug(
-            '[fetchDeliverServicePorfile] Cant resolve deliveryServiceEnsName',
+            '[fetchDeliveryServiceProfile] account has no delivery-service profile',
         );
         return {
             account,
