@@ -146,6 +146,7 @@ describe('Dm3Sdk', () => {
         await dm3.conversations.addConversation('bob.eth');
         await dm3.conversations.addConversation('karl.eth');
         const c = dm3.conversations.list;
+
         console.log(c);
         expect(c.length).toBe(2);
         expect(c[0].contact.name).toBe('bob.eth');

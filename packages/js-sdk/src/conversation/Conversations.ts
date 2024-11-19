@@ -1,19 +1,13 @@
 /* eslint-disable max-len */
+import { Account, normalizeEnsName } from '@dm3-org/dm3-lib-profile';
 import {
-    Account,
-    DeliveryServiceProfile,
-    getAccountDisplayName,
-    normalizeEnsName,
-} from '@dm3-org/dm3-lib-profile';
-import {
-    StorageAPI,
     Conversation as ConversationDto,
+    StorageAPI,
 } from '@dm3-org/dm3-lib-storage';
-import { Contact, Conversation, getEmptyContact } from './types';
-import { Tld } from '../tld/Tld';
-import { hydrateContract as hydrateContact } from './hydrate/hydrateContact';
 import { ethers } from 'ethers';
 import { ITLDResolver } from '../tld/nameService/ITLDResolver';
+import { hydrateContract as hydrateContact } from './hydrate/hydrateContact';
+import { Contact, Conversation, getEmptyContact } from './types';
 
 export class Conversations {
     private readonly provider: ethers.providers.JsonRpcProvider;
