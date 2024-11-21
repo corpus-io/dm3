@@ -137,6 +137,7 @@ export class Dm3Sdk {
             tld,
             this.mainnetProvider,
             account,
+            profileKeys,
             this.addressEnsSubdomain,
         );
 

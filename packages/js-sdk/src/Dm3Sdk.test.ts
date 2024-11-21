@@ -198,7 +198,7 @@ describe('Dm3Sdk', () => {
         });
     });
 
-    describe('messages', () => {
+    describe('Messages', () => {
         it('can send a message', async () => {
             const mockTldResolver = {
                 resolveTLDtoAlias: async () =>
@@ -234,6 +234,42 @@ describe('Dm3Sdk', () => {
             const c = await dm3.conversations.addConversation('bob.eth');
             expect(c?.messages.list().length).toBe(0);
             await c?.messages.addMessage('bob.eth', msg1);
+
+            expect(c?.messages.list().length).toBe(1);
+            expect(c?.messages.list()[0].envelop.message.message).toBe('Hi');
+        });
+        it('can send a message', async () => {
+            const mockTldResolver = {
+                resolveTLDtoAlias: async () =>
+                    `${normalizeEnsName(bob.address)}.addr.test`,
+                resolveAliasToTLD: async () => 'bob.eth',
+            } as unknown as ITLDResolver;
+
+            const mockConfig: Dm3SdkConfig = {
+                mainnetProvider: {} as ethers.providers.JsonRpcProvider,
+                storageApi: {
+                    addConversation: async () => {},
+                    addMessage: async () => {},
+                } as unknown as StorageAPI,
+                nonce: '1',
+                defaultDeliveryService: 'test.io',
+                addressEnsSubdomain: '.addr.test',
+                userEnsSubdomain: '.user.test',
+                resolverBackendUrl: 'resolver.io',
+                backendUrl: 'http://localhost:4060',
+                _tld: mockTldResolver,
+            };
+
+            const dm3 = await new Dm3Sdk(mockConfig).login({
+                profileKeys: alice.profileKeys,
+                profile: alice.signedUserProfile,
+                accountAddress: alice.address,
+            });
+
+            const c = await dm3.conversations.addConversation('bob.eth');
+            expect(c?.messages.list().length).toBe(0);
+
+            await c?.messages.sendMessage('Hi');
 
             expect(c?.messages.list().length).toBe(1);
             expect(c?.messages.list()[0].envelop.message.message).toBe('Hi');

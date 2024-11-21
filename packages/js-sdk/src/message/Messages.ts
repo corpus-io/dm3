@@ -1,4 +1,4 @@
-import { encryptAsymmetric } from '@dm3-org/dm3-lib-crypto';
+import { encryptAsymmetric, sign } from '@dm3-org/dm3-lib-crypto';
 import {
     buildEnvelop,
     EncryptionEnvelop,
@@ -22,20 +22,52 @@ import { MessageModel, MessageSource } from './types';
 export class Messages {
     private readonly storageApi: StorageAPI;
     private readonly conversations: Conversations;
-    private readonly account: Account;
-    private readonly profileKeys: ProfileKeys;
 
     private readonly _messages: MessageModel[];
 
-    constructor(storageApi: StorageAPI, conversations: Conversations) {
+    private readonly senderAccount: Account;
+    private readonly senderProfileKeys: ProfileKeys;
+    private readonly receiver: Contact;
+
+    constructor(
+        storageApi: StorageAPI,
+        conversations: Conversations,
+        senderAccount: Account,
+        senderProfileKeys: ProfileKeys,
+        receiver: Contact,
+    ) {
         this.storageApi = storageApi;
         this.conversations = conversations;
-
+        this.senderAccount = senderAccount;
+        this.senderProfileKeys = senderProfileKeys;
+        this.receiver = receiver;
         this._messages = [];
     }
 
     public list() {
         return renderMessage(this._messages);
+    }
+    public async sendMessage(msg: string) {
+        const messageWithoutSig: Omit<Message, 'signature'> = {
+            message: msg,
+            attachments: [],
+            metadata: {
+                referenceMessageHash: undefined,
+                type: 'NEW',
+                to: this.receiver.account.ensName,
+                from: this.senderAccount.ensName,
+                timestamp: new Date().getTime(),
+            },
+        };
+
+        const message: Message = {
+            ...messageWithoutSig,
+            signature: await sign(
+                this.senderProfileKeys.signingKeyPair.privateKey,
+                stringify(messageWithoutSig),
+            ),
+        };
+        return await this.addMessage(this.receiver.account.ensName, message);
     }
 
     public async addMessage(
@@ -112,7 +144,7 @@ export class Messages {
                         (publicKey: string, msg: string) =>
                             encryptAsymmetric(publicKey, msg),
                         {
-                            from: this.account!,
+                            from: this.senderAccount!,
                             to: {
                                 ...recipient!.account,
                                 //Cover edge case of lukso names. TODO discuss with the team and decide how to dela with non ENS names
@@ -121,7 +153,7 @@ export class Messages {
                                     : recipient.name,
                             },
                             deliverServiceProfile,
-                            keys: this.profileKeys!,
+                            keys: this.senderProfileKeys,
                         },
                     );
                 },

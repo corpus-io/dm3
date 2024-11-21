@@ -1,5 +1,9 @@
 /* eslint-disable max-len */
-import { Account, normalizeEnsName } from '@dm3-org/dm3-lib-profile';
+import {
+    Account,
+    normalizeEnsName,
+    ProfileKeys,
+} from '@dm3-org/dm3-lib-profile';
 import {
     Conversation as ConversationDto,
     StorageAPI,
@@ -16,7 +20,7 @@ export class Conversations {
     private readonly tld: ITLDResolver;
     private readonly addressEnsSubdomain: string;
     private readonly account: Account;
-
+    private readonly profileKeys: ProfileKeys;
     public list: Conversation[];
 
     constructor(
@@ -24,6 +28,7 @@ export class Conversations {
         tld: ITLDResolver,
         mainnetProvider: ethers.providers.JsonRpcProvider,
         account: Account,
+        profileKeys: ProfileKeys,
         addressEnsSubdomain: string,
     ) {
         this.storageApi = storageApi;
@@ -31,6 +36,7 @@ export class Conversations {
         this.account = account;
         this.provider = mainnetProvider;
         this.addressEnsSubdomain = addressEnsSubdomain;
+        this.profileKeys = profileKeys;
         this.list = [];
     }
 
@@ -89,7 +95,13 @@ export class Conversations {
 
         const newConversation: Conversation = {
             //TODO change that once Message class has been implemented
-            messages: new Messages(this.storageApi, this),
+            messages: new Messages(
+                this.storageApi,
+                this,
+                this.account,
+                this.profileKeys,
+                newContact,
+            ),
             contact: newContact,
         };
         //Set the new contact to the list
@@ -103,7 +115,13 @@ export class Conversations {
         );
 
         const hydratedConversation: Conversation = {
-            messages: new Messages(this.storageApi, this),
+            messages: new Messages(
+                this.storageApi,
+                this,
+                this.account,
+                this.profileKeys,
+                hydratedContact,
+            ),
             contact: hydratedContact,
         };
         //find existing contact and replace it with the hydrated one
@@ -132,7 +150,13 @@ export class Conversations {
             this.addressEnsSubdomain,
         );
         const hydratedConversation: Conversation = {
-            messages: new Messages(this.storageApi, this),
+            messages: new Messages(
+                this.storageApi,
+                this,
+                this.account,
+                this.profileKeys,
+                hydratedContact,
+            ),
             contact: hydratedContact,
         };
         this.list.push(hydratedConversation);
