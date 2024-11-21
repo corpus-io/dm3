@@ -20,37 +20,8 @@ import {
 import { submitEnvelopsToReceiversDs } from '../api/ds/submitEnvelopsToReceiversDs';
 import { Conversations } from '../conversation/Conversations';
 import { Contact } from '../conversation/types';
-
-const DEFAULT_MESSAGE_PAGESIZE = 100;
-
-export enum MessageIndicator {
-    SENT = 'SENT',
-    RECEIVED = 'RECEIVED',
-    READED = 'READED',
-}
-
-//Message source to identify where a message comes from. This is important to handle pagination of storage messages properly
-export enum MessageSource {
-    //Messages added by the client via addMessage
-    Client,
-    //Messages fetched from the storage
-    Storage,
-    //Messages fetched from the deliveryService
-    DeliveryService,
-    //Messages received from the Websocket
-    WebSocket,
-}
-
-export type MessageModel = StorageEnvelopContainerNew & {
-    reactions: Envelop[];
-    replyToMessageEnvelop?: Envelop;
-    source: MessageSource;
-    indicator?: MessageIndicator;
-};
-
-export type MessageStorage = {
-    [contact: string]: MessageModel[];
-};
+import { renderMessage } from './renderer/renderMessage';
+import { MessageModel, MessageSource } from './types';
 
 export class Messages {
     private readonly storageApi: StorageAPI;
@@ -58,17 +29,23 @@ export class Messages {
     private readonly account: Account;
     private readonly profileKeys: ProfileKeys;
 
-    private messages: MessageStorage = {};
+    private readonly _messages: MessageModel[];
 
     constructor(storageApi: StorageAPI, conversations: Conversations) {
         this.storageApi = storageApi;
         this.conversations = conversations;
+
+        this._messages = [];
     }
 
-    addMessage = async (
+    public list() {
+        return renderMessage(this._messages);
+    }
+
+    public async addMessage(
         _contactName: string,
         message: Message,
-    ): Promise<{ isSuccess: boolean; error?: string }> => {
+    ): Promise<{ isSuccess: boolean; error?: string }> {
         const contact = normalizeEnsName(_contactName);
         //If a message is empty it should not be added
 
@@ -122,13 +99,13 @@ export class Messages {
 
         //If neither the recipient nor the potential recipient is a DM3 user we store the message in the storage
         return await this._haltMessage(contact, message);
-    };
+    }
 
-    private _dispatchMessage = async (
+    private async _dispatchMessage(
         contact: string,
         recipient: Contact,
         message: Message,
-    ) => {
+    ) {
         //Build the envelops based on the message and the users profileKeys.
         //For each deliveryServiceProfile a envelop is created that will be sent to the delivery service
         const envelops = await Promise.all(
@@ -183,7 +160,7 @@ export class Messages {
         };
 
         //Add the message to the state
-        this.messages[contact].push(messageStorageContainer);
+        this._messages.push(messageStorageContainer);
 
         //Storage the message in the storage async
         this.storageApi.addMessage(contact, messageStorageContainer, false);
@@ -204,9 +181,9 @@ export class Messages {
         //Send the envelops to the delivery service
         await submitEnvelopsToReceiversDs(envelops);
         return { isSuccess: true };
-    };
+    }
 
-    private _haltMessage = async (contact: string, message: Message) => {
+    private _haltMessage(contact: string, message: Message) {
         //StorageEnvelopContainerNew to store the message in the storage
         const messageModel: MessageModel = {
             envelop: {
@@ -225,21 +202,21 @@ export class Messages {
             source: MessageSource.Client,
             reactions: [],
         };
-        this.messages[contact].push(messageModel);
+        this._messages.push(messageModel);
         //Store the message and mark it as halted
         this.storageApi.addMessage(contact, messageModel, true);
         return { isSuccess: true };
-    };
+    }
     //TODO migrate to real lukso name service
     isLuksoName = (input: string): boolean => {
         const regex = /^[a-zA-Z0-9]+#[a-zA-Z0-9]{4}\.up$/;
         return regex.test(input);
     };
 
-    private checkIfEnvelopAreInSizeLimit = async (
+    private async checkIfEnvelopAreInSizeLimit(
         encryptedEnvelops: EncryptionEnvelop[],
         receiversMessageSizeLimit: number,
-    ): Promise<boolean> => {
+    ): Promise<boolean> {
         try {
             const atLeastOneEnvelopIsToLarge = !!encryptedEnvelops
                 //get the size of each envelop
@@ -255,5 +232,5 @@ export class Messages {
             console.error('Error in checkIfEnvelopAreInSizeLimit', error);
             return false;
         }
-    };
+    }
 }

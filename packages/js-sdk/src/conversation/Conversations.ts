@@ -8,6 +8,7 @@ import { ethers } from 'ethers';
 import { ITLDResolver } from '../tld/nameService/ITLDResolver';
 import { hydrateContract as hydrateContact } from './hydrate/hydrateContact';
 import { Contact, Conversation, getEmptyContact } from './types';
+import { Messages } from '../message/Messages';
 
 export class Conversations {
     private readonly provider: ethers.providers.JsonRpcProvider;
@@ -88,7 +89,7 @@ export class Conversations {
 
         const newConversation: Conversation = {
             //TODO change that once Message class has been implemented
-            messages: undefined as any,
+            messages: new Messages(this.storageApi, this),
             contact: newContact,
         };
         //Set the new contact to the list
@@ -102,7 +103,7 @@ export class Conversations {
         );
 
         const hydratedConversation: Conversation = {
-            messages: undefined as any,
+            messages: new Messages(this.storageApi, this),
             contact: hydratedContact,
         };
         //find existing contact and replace it with the hydrated one
@@ -131,7 +132,7 @@ export class Conversations {
             this.addressEnsSubdomain,
         );
         const hydratedConversation: Conversation = {
-            messages: undefined as any,
+            messages: new Messages(this.storageApi, this),
             contact: hydratedContact,
         };
         this.list.push(hydratedConversation);

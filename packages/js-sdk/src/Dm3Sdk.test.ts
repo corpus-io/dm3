@@ -1,6 +1,9 @@
 import { StorageAPI } from '@dm3-org/dm3-lib-storage';
 import {
+    getMockDeliveryServiceProfile,
+    MockDeliveryServiceProfile,
     MockedUserProfile,
+    MockMessageFactory,
     mockUserProfile,
 } from '@dm3-org/dm3-lib-test-helper';
 import axios from 'axios';
@@ -19,6 +22,8 @@ describe('Dm3Sdk', () => {
     //Axios mock to mock the http requests
     let axiosMock;
 
+    let deliveryService: MockDeliveryServiceProfile;
+
     beforeEach(async () => {
         alice = await mockUserProfile(
             ethers.Wallet.createRandom(),
@@ -32,6 +37,11 @@ describe('Dm3Sdk', () => {
         karl = await mockUserProfile(ethers.Wallet.createRandom(), 'karl.up', [
             'test.io',
         ]);
+
+        deliveryService = await getMockDeliveryServiceProfile(
+            ethers.Wallet.createRandom(),
+            'http://localhost:3000',
+        );
 
         axiosMock = new MockAdapter(axios);
 
@@ -63,126 +73,170 @@ describe('Dm3Sdk', () => {
             .reply(200);
     });
 
-    it('can add a conversation to the contact list', async () => {
-        const mockTldResolver = {
-            resolveTLDtoAlias: async () =>
-                `${normalizeEnsName(bob.address)}.addr.test`,
-            resolveAliasToTLD: async () => 'bob.eth',
-        } as unknown as ITLDResolver;
+    describe('conversations', () => {
+        it('can add a conversation to the contact list', async () => {
+            const mockTldResolver = {
+                resolveTLDtoAlias: async () =>
+                    `${normalizeEnsName(bob.address)}.addr.test`,
+                resolveAliasToTLD: async () => 'bob.eth',
+            } as unknown as ITLDResolver;
 
-        const mockConfig: Dm3SdkConfig = {
-            mainnetProvider: {} as ethers.providers.JsonRpcProvider,
-            storageApi: {
-                addConversation: async () => {},
-            } as unknown as StorageAPI,
-            nonce: '1',
-            defaultDeliveryService: 'test.io',
-            addressEnsSubdomain: '.addr.test',
-            userEnsSubdomain: '.user.test',
-            resolverBackendUrl: 'resolver.io',
-            backendUrl: 'http://localhost:4060',
-            _tld: mockTldResolver,
-        };
+            const mockConfig: Dm3SdkConfig = {
+                mainnetProvider: {} as ethers.providers.JsonRpcProvider,
+                storageApi: {
+                    addConversation: async () => {},
+                } as unknown as StorageAPI,
+                nonce: '1',
+                defaultDeliveryService: 'test.io',
+                addressEnsSubdomain: '.addr.test',
+                userEnsSubdomain: '.user.test',
+                resolverBackendUrl: 'resolver.io',
+                backendUrl: 'http://localhost:4060',
+                _tld: mockTldResolver,
+            };
 
-        const dm3 = await new Dm3Sdk(mockConfig).login({
-            profileKeys: alice.profileKeys,
-            profile: alice.signedUserProfile,
-            accountAddress: alice.address,
+            const dm3 = await new Dm3Sdk(mockConfig).login({
+                profileKeys: alice.profileKeys,
+                profile: alice.signedUserProfile,
+                accountAddress: alice.address,
+            });
+
+            await dm3.conversations.addConversation('bob.eth');
+            const c = dm3.conversations.list;
+            expect(c.length).toBe(1);
+            expect(c[0].contact.name).toBe('bob.eth');
         });
+        it('can multiple conversations to the contact list', async () => {
+            const mockTldResolver = {
+                resolveTLDtoAlias: async (ensName: string) => {
+                    if (ensName === 'alice.eth') {
+                        return `${normalizeEnsName(alice.address)}.addr.test`;
+                    }
+                    if (ensName === 'bob.eth') {
+                        return `${normalizeEnsName(bob.address)}.addr.test`;
+                    }
+                    return `${normalizeEnsName(karl.address)}.addr.test`;
+                },
+                resolveAliasToTLD: async (ensName: string) => {
+                    if (
+                        normalizeEnsName(ensName) ===
+                        normalizeEnsName(alice.address) + '.addr.test'
+                    ) {
+                        return 'alice.eth';
+                    }
+                    if (
+                        normalizeEnsName(ensName) ===
+                        normalizeEnsName(bob.address) + '.addr.test'
+                    ) {
+                        return 'bob.eth';
+                    }
+                    return 'karl.eth';
+                },
+            } as unknown as ITLDResolver;
 
-        await dm3.conversations.addConversation('bob.eth');
-        const c = dm3.conversations.list;
-        expect(c.length).toBe(1);
-        expect(c[0].contact.name).toBe('bob.eth');
+            const mockConfig: Dm3SdkConfig = {
+                mainnetProvider: {} as ethers.providers.JsonRpcProvider,
+                storageApi: {
+                    addConversation: async () => {},
+                } as unknown as StorageAPI,
+                nonce: '1',
+                defaultDeliveryService: 'test.io',
+                addressEnsSubdomain: '.addr.test',
+                userEnsSubdomain: '.user.test',
+                resolverBackendUrl: 'resolver.io',
+                backendUrl: 'http://localhost:4060',
+                _tld: mockTldResolver,
+            };
+
+            const dm3 = await new Dm3Sdk(mockConfig).login({
+                profileKeys: alice.profileKeys,
+                profile: alice.signedUserProfile,
+                accountAddress: alice.address,
+            });
+
+            await dm3.conversations.addConversation('bob.eth');
+            await dm3.conversations.addConversation('karl.eth');
+            const c = dm3.conversations.list;
+            dm3;
+            console.log(c);
+            expect(c.length).toBe(2);
+            expect(c[0].contact.name).toBe('bob.eth');
+            expect(c[1].contact.name).toBe('karl.eth');
+        });
+        it('dont add duplicate conversations', async () => {
+            const mockTldResolver = {
+                resolveTLDtoAlias: async () =>
+                    `${normalizeEnsName(bob.address)}.addr.test`,
+                resolveAliasToTLD: async () => 'bob.eth',
+            } as unknown as ITLDResolver;
+
+            const mockConfig: Dm3SdkConfig = {
+                mainnetProvider: {} as ethers.providers.JsonRpcProvider,
+                storageApi: {
+                    addConversation: async () => {},
+                } as unknown as StorageAPI,
+                nonce: '1',
+                defaultDeliveryService: 'test.io',
+                addressEnsSubdomain: '.addr.test',
+                userEnsSubdomain: '.user.test',
+                resolverBackendUrl: 'resolver.io',
+                backendUrl: 'http://localhost:4060',
+                _tld: mockTldResolver,
+            };
+
+            const dm3 = await new Dm3Sdk(mockConfig).login({
+                profileKeys: alice.profileKeys,
+                profile: alice.signedUserProfile,
+                accountAddress: alice.address,
+            });
+
+            await dm3.conversations.addConversation('bob.eth');
+            await dm3.conversations.addConversation('bob.eth');
+            const c = dm3.conversations.list;
+            expect(c.length).toBe(1);
+            expect(c[0].contact.name).toBe('bob.eth');
+        });
     });
-    it('can multiple conversations to the contact list', async () => {
-        const mockTldResolver = {
-            resolveTLDtoAlias: async (ensName: string) => {
-                if (ensName === 'alice.eth') {
-                    return `${normalizeEnsName(alice.address)}.addr.test`;
-                }
-                if (ensName === 'bob.eth') {
-                    return `${normalizeEnsName(bob.address)}.addr.test`;
-                }
-                return `${normalizeEnsName(karl.address)}.addr.test`;
-            },
-            resolveAliasToTLD: async (ensName: string) => {
-                if (
-                    normalizeEnsName(ensName) ===
-                    normalizeEnsName(alice.address) + '.addr.test'
-                ) {
-                    return 'alice.eth';
-                }
-                if (
-                    normalizeEnsName(ensName) ===
-                    normalizeEnsName(bob.address) + '.addr.test'
-                ) {
-                    return 'bob.eth';
-                }
-                return 'karl.eth';
-            },
-        } as unknown as ITLDResolver;
 
-        const mockConfig: Dm3SdkConfig = {
-            mainnetProvider: {} as ethers.providers.JsonRpcProvider,
-            storageApi: {
-                addConversation: async () => {},
-            } as unknown as StorageAPI,
-            nonce: '1',
-            defaultDeliveryService: 'test.io',
-            addressEnsSubdomain: '.addr.test',
-            userEnsSubdomain: '.user.test',
-            resolverBackendUrl: 'resolver.io',
-            backendUrl: 'http://localhost:4060',
-            _tld: mockTldResolver,
-        };
+    describe('messages', () => {
+        it('can send a message', async () => {
+            const mockTldResolver = {
+                resolveTLDtoAlias: async () =>
+                    `${normalizeEnsName(bob.address)}.addr.test`,
+                resolveAliasToTLD: async () => 'bob.eth',
+            } as unknown as ITLDResolver;
 
-        const dm3 = await new Dm3Sdk(mockConfig).login({
-            profileKeys: alice.profileKeys,
-            profile: alice.signedUserProfile,
-            accountAddress: alice.address,
+            const mockConfig: Dm3SdkConfig = {
+                mainnetProvider: {} as ethers.providers.JsonRpcProvider,
+                storageApi: {
+                    addConversation: async () => {},
+                    addMessage: async () => {},
+                } as unknown as StorageAPI,
+                nonce: '1',
+                defaultDeliveryService: 'test.io',
+                addressEnsSubdomain: '.addr.test',
+                userEnsSubdomain: '.user.test',
+                resolverBackendUrl: 'resolver.io',
+                backendUrl: 'http://localhost:4060',
+                _tld: mockTldResolver,
+            };
+
+            const dm3 = await new Dm3Sdk(mockConfig).login({
+                profileKeys: alice.profileKeys,
+                profile: alice.signedUserProfile,
+                accountAddress: alice.address,
+            });
+
+            const msgFactory = MockMessageFactory(alice, bob, deliveryService);
+
+            const msg1 = await msgFactory.createMessage('Hi');
+
+            const c = await dm3.conversations.addConversation('bob.eth');
+            expect(c?.messages.list().length).toBe(0);
+            await c?.messages.addMessage('bob.eth', msg1);
+
+            expect(c?.messages.list().length).toBe(1);
+            expect(c?.messages.list()[0].envelop.message.message).toBe('Hi');
         });
-
-        await dm3.conversations.addConversation('bob.eth');
-        await dm3.conversations.addConversation('karl.eth');
-        const c = dm3.conversations.list;
-
-        console.log(c);
-        expect(c.length).toBe(2);
-        expect(c[0].contact.name).toBe('bob.eth');
-        expect(c[1].contact.name).toBe('karl.eth');
-    });
-    it('dont add duplicate conversations', async () => {
-        const mockTldResolver = {
-            resolveTLDtoAlias: async () =>
-                `${normalizeEnsName(bob.address)}.addr.test`,
-            resolveAliasToTLD: async () => 'bob.eth',
-        } as unknown as ITLDResolver;
-
-        const mockConfig: Dm3SdkConfig = {
-            mainnetProvider: {} as ethers.providers.JsonRpcProvider,
-            storageApi: {
-                addConversation: async () => {},
-            } as unknown as StorageAPI,
-            nonce: '1',
-            defaultDeliveryService: 'test.io',
-            addressEnsSubdomain: '.addr.test',
-            userEnsSubdomain: '.user.test',
-            resolverBackendUrl: 'resolver.io',
-            backendUrl: 'http://localhost:4060',
-            _tld: mockTldResolver,
-        };
-
-        const dm3 = await new Dm3Sdk(mockConfig).login({
-            profileKeys: alice.profileKeys,
-            profile: alice.signedUserProfile,
-            accountAddress: alice.address,
-        });
-
-        await dm3.conversations.addConversation('bob.eth');
-        await dm3.conversations.addConversation('bob.eth');
-        const c = dm3.conversations.list;
-        expect(c.length).toBe(1);
-        expect(c[0].contact.name).toBe('bob.eth');
     });
 });
