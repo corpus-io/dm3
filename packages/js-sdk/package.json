@@ -3,8 +3,13 @@
     "name": "@dm3-org/dm3-js-sdk",
     "license": "BSD-2-Clause",
     "version": "0.0.1",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "./lib/esm/index.js",
+    "types": "./lib/esm/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./lib/esm/index.js"
+        }
+    },
     "dependencies": {
         "@dm3-org/dm3-lib-crypto": "workspace:^",
         "@dm3-org/dm3-lib-delivery": "workspace:^",
@@ -12,12 +17,15 @@
         "@dm3-org/dm3-lib-profile": "workspace:^",
         "@dm3-org/dm3-lib-server-side": "workspace:^",
         "@dm3-org/dm3-lib-shared": "workspace:^",
+        "@dm3-org/dm3-lib-smart-account": "workspace:^",
         "@dm3-org/dm3-lib-storage": "workspace:^",
         "@dm3-org/dm3-lib-test-helper": "workspace:^",
         "@web3-name-sdk/core": "^0.2.0",
         "axios": "^0.27.2",
         "dotenv": "^16.0.1",
-        "ethers": "5.7.2"
+        "ethers": "5",
+        "siwe": "^2.3.2",
+        "socket.io-client": "^4.8.1"
     },
     "scripts": {
         "test": "jest --coverage --transformIgnorePatterns 'node_modules/(?!(dm3-lib-\\w*)/)'",
