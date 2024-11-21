@@ -42,7 +42,9 @@ describe('Dm3Sdk', () => {
             ethers.Wallet.createRandom(),
             'http://localhost:3000',
         );
+    });
 
+    beforeAll(() => {
         axiosMock = new MockAdapter(axios);
 
         //Mock BackendConnector HttpRequests
@@ -102,9 +104,8 @@ describe('Dm3Sdk', () => {
             });
 
             await dm3.conversations.addConversation('bob.eth');
-            const c = dm3.conversations.list;
-            expect(c.length).toBe(1);
-            expect(c[0].contact.name).toBe('bob.eth');
+            expect(dm3.conversations.list.length).toBe(1);
+            expect(dm3.conversations.list[0].contact.name).toBe('bob.eth');
         });
         it('can multiple conversations to the contact list', async () => {
             const mockTldResolver = {
@@ -156,12 +157,10 @@ describe('Dm3Sdk', () => {
 
             await dm3.conversations.addConversation('bob.eth');
             await dm3.conversations.addConversation('karl.eth');
-            const c = dm3.conversations.list;
-            dm3;
-            console.log(c);
-            expect(c.length).toBe(2);
-            expect(c[0].contact.name).toBe('bob.eth');
-            expect(c[1].contact.name).toBe('karl.eth');
+
+            expect(dm3.conversations.list.length).toBe(2);
+            expect(dm3.conversations.list[0].contact.name).toBe('bob.eth');
+            expect(dm3.conversations.list[1].contact.name).toBe('karl.eth');
         });
         it('dont add duplicate conversations', async () => {
             const mockTldResolver = {
@@ -192,9 +191,8 @@ describe('Dm3Sdk', () => {
 
             await dm3.conversations.addConversation('bob.eth');
             await dm3.conversations.addConversation('bob.eth');
-            const c = dm3.conversations.list;
-            expect(c.length).toBe(1);
-            expect(c[0].contact.name).toBe('bob.eth');
+            expect(dm3.conversations.list.length).toBe(1);
+            expect(dm3.conversations.list[0].contact.name).toBe('bob.eth');
         });
     });
 
@@ -231,12 +229,25 @@ describe('Dm3Sdk', () => {
 
             const msg1 = await msgFactory.createMessage('Hi');
 
-            const c = await dm3.conversations.addConversation('bob.eth');
-            expect(c?.messages.list().length).toBe(0);
-            await c?.messages.addMessage('bob.eth', msg1);
+            expect(
+                (
+                    await dm3.conversations.addConversation('bob.eth')
+                )?.messages.list().length,
+            ).toBe(0);
+            await (
+                await dm3.conversations.addConversation('bob.eth')
+            )?.messages.addMessage('bob.eth', msg1);
 
-            expect(c?.messages.list().length).toBe(1);
-            expect(c?.messages.list()[0].envelop.message.message).toBe('Hi');
+            expect(
+                (
+                    await dm3.conversations.addConversation('bob.eth')
+                )?.messages.list().length,
+            ).toBe(1);
+            expect(
+                (
+                    await dm3.conversations.addConversation('bob.eth')
+                )?.messages.list()[0].envelop.message.message,
+            ).toBe('Hi');
         });
         it('can send a message', async () => {
             const mockTldResolver = {
@@ -266,13 +277,26 @@ describe('Dm3Sdk', () => {
                 accountAddress: alice.address,
             });
 
-            const c = await dm3.conversations.addConversation('bob.eth');
-            expect(c?.messages.list().length).toBe(0);
+            expect(
+                (
+                    await dm3.conversations.addConversation('bob.eth')
+                )?.messages.list().length,
+            ).toBe(0);
 
-            await c?.messages.sendMessage('Hi');
+            await (
+                await dm3.conversations.addConversation('bob.eth')
+            )?.messages.sendMessage('Hi');
 
-            expect(c?.messages.list().length).toBe(1);
-            expect(c?.messages.list()[0].envelop.message.message).toBe('Hi');
+            expect(
+                (
+                    await dm3.conversations.addConversation('bob.eth')
+                )?.messages.list().length,
+            ).toBe(1);
+            expect(
+                (
+                    await dm3.conversations.addConversation('bob.eth')
+                )?.messages.list()[0].envelop.message.message,
+            ).toBe('Hi');
         });
     });
 });
