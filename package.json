@@ -25,7 +25,8 @@
             "packages/messenger-web",
             "packages/cli",
             "packages/toplevel-alias",
-            "packages/delivery-service"
+            "packages/delivery-service",
+            "packages/messenger-vue-demo"
         ],
         "nohoist": [
             "**/react",
