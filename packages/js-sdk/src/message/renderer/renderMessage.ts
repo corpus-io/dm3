@@ -1,4 +1,4 @@
-import { MessageModel } from '../Messages';
+import { MessageModel } from '../types';
 import { renderDelete } from './messageTypes/renderDelete';
 import { renderDuplicates } from './messageTypes/renderDuplicates';
 import { renderEdit } from './messageTypes/renderEdit';

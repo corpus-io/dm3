@@ -2,7 +2,6 @@ import { encryptAsymmetric } from '@dm3-org/dm3-lib-crypto';
 import {
     buildEnvelop,
     EncryptionEnvelop,
-    Envelop,
     getEnvelopSize,
     Message,
     MessageState,
@@ -13,10 +12,7 @@ import {
     ProfileKeys,
 } from '@dm3-org/dm3-lib-profile';
 import { sha256, stringify } from '@dm3-org/dm3-lib-shared';
-import {
-    StorageAPI,
-    StorageEnvelopContainer as StorageEnvelopContainerNew,
-} from '@dm3-org/dm3-lib-storage';
+import { StorageAPI } from '@dm3-org/dm3-lib-storage';
 import { submitEnvelopsToReceiversDs } from '../api/ds/submitEnvelopsToReceiversDs';
 import { Conversations } from '../conversation/Conversations';
 import { Contact } from '../conversation/types';
