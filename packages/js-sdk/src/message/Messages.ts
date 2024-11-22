@@ -44,7 +44,7 @@ export class Messages {
         this._messages = [];
     }
 
-    public list() {
+    public get list() {
         return renderMessage(this._messages);
     }
     public async sendMessage(msg: string) {
@@ -56,7 +56,7 @@ export class Messages {
                 type: 'NEW',
                 to: this.receiver.account.ensName,
                 from: this.senderAccount.ensName,
-                timestamp: new Date().getTime(),
+                timestamp: Date.now(),
             },
         };
 
@@ -241,10 +241,10 @@ export class Messages {
         return regex.test(input);
     };
 
-    private async checkIfEnvelopAreInSizeLimit(
+    private checkIfEnvelopAreInSizeLimit(
         encryptedEnvelops: EncryptionEnvelop[],
         receiversMessageSizeLimit: number,
-    ): Promise<boolean> {
+    ): boolean {
         try {
             const atLeastOneEnvelopIsToLarge = !!encryptedEnvelops
                 //get the size of each envelop

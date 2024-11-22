@@ -1,10 +1,12 @@
-import { MessageModel } from '../../types';
+import { MessageActionType, MessageModel } from '../../types';
 
 export const renderReactions = (messages: MessageModel[]) => {
     //We filter out all messages that are reactions
     const reactions = messages
         .filter(
-            (message) => message.envelop.message.metadata.type === 'REACTION',
+            (message) =>
+                message.envelop.message.metadata.type ===
+                MessageActionType.REACT,
         )
         .map((reaction) => reaction.envelop);
 

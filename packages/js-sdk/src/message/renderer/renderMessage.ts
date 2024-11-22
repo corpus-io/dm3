@@ -21,12 +21,6 @@ export const renderMessage = (messages: MessageModel[]) => {
     const withReply = renderReply(withReactions);
 
     const withoutEdited = renderEdit(withReply);
-    //Sort the messages by timestamp DESC to show them in the right order
-    // withoutEdited.sort(
-    //     (a, b) =>
-    //         b.envelop.message.metadata.timestamp -
-    //         a.envelop.message.metadata.timestamp,
-    // );
 
     //There a several ways a message can added to the client. I.e via Websocket, multiple DS or from the storage.
     //This leads occasionally to duplicates we don't want to display.
