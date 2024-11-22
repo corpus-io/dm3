@@ -1,33 +1,34 @@
 /* eslint-disable max-len */
 import {
     Account,
-    DeliveryServiceProfile,
-    getAccountDisplayName,
     normalizeEnsName,
+    ProfileKeys,
 } from '@dm3-org/dm3-lib-profile';
 import {
-    StorageAPI,
     Conversation as ConversationDto,
+    StorageAPI,
 } from '@dm3-org/dm3-lib-storage';
-import { Contact, Conversation, getEmptyContact } from './types';
-import { Tld } from '../tld/Tld';
-import { hydrateContract as hydrateContact } from './hydrate/hydrateContact';
 import { ethers } from 'ethers';
+import { ITLDResolver } from '../tld/nameService/ITLDResolver';
+import { hydrateContract as hydrateContact } from './hydrate/hydrateContact';
+import { Contact, Conversation, getEmptyContact } from './types';
+import { Messages } from '../message/Messages';
 
 export class Conversations {
     private readonly provider: ethers.providers.JsonRpcProvider;
     private readonly storageApi: StorageAPI;
-    private readonly tld: Tld;
+    private readonly tld: ITLDResolver;
     private readonly addressEnsSubdomain: string;
     private readonly account: Account;
-
-    public conversations: Conversation[];
+    private readonly profileKeys: ProfileKeys;
+    public list: Conversation[];
 
     constructor(
         storageApi: StorageAPI,
-        tld: Tld,
+        tld: ITLDResolver,
         mainnetProvider: ethers.providers.JsonRpcProvider,
         account: Account,
+        profileKeys: ProfileKeys,
         addressEnsSubdomain: string,
     ) {
         this.storageApi = storageApi;
@@ -35,7 +36,8 @@ export class Conversations {
         this.account = account;
         this.provider = mainnetProvider;
         this.addressEnsSubdomain = addressEnsSubdomain;
-        this.conversations = [];
+        this.profileKeys = profileKeys;
+        this.list = [];
     }
 
     public async addConversation(_ensName: string) {
@@ -49,6 +51,7 @@ export class Conversations {
             updatedAt: new Date().getTime(),
             previewMessage: undefined,
         };
+
         const conversationPreview = this._addConversation(newConversation);
         //Add the contact to the storage in the background
         this.storageApi.addConversation(aliasName, [contactTldName]);
@@ -64,7 +67,7 @@ export class Conversations {
         if (isOwnContact) {
             return;
         }
-        const alreadyAddedContact = this.conversations.find(
+        const alreadyAddedContact = this.list.find(
             (existingContact) =>
                 existingContact.contact.account.ensName === ensName,
         );
@@ -92,7 +95,13 @@ export class Conversations {
 
         const newConversation: Conversation = {
             //TODO change that once Message class has been implemented
-            messages: undefined as any,
+            messages: new Messages(
+                this.storageApi,
+                this,
+                this.account,
+                this.profileKeys,
+                newContact,
+            ),
             contact: newContact,
         };
         //Set the new contact to the list
@@ -101,16 +110,27 @@ export class Conversations {
         const hydratedContact = await hydrateContact(
             this.provider,
             conversation,
-            this.tld.resolveTLDtoAlias,
+            this.tld.resolveAliasToTLD,
             this.addressEnsSubdomain,
         );
 
         const hydratedConversation: Conversation = {
-            messages: undefined as any,
+            messages: new Messages(
+                this.storageApi,
+                this,
+                this.account,
+                this.profileKeys,
+                hydratedContact,
+            ),
             contact: hydratedContact,
         };
-        this.conversations.push(hydratedConversation);
-
+        //find existing contact and replace it with the hydrated one
+        this.list = this.list.map((existingContact) => {
+            if (existingContact.contact.account.ensName === ensName) {
+                return hydratedConversation;
+            }
+            return existingContact;
+        });
         //Return the new onhydrated contact
         return hydratedConversation;
     }
@@ -126,14 +146,20 @@ export class Conversations {
         const hydratedContact = await hydrateContact(
             this.provider,
             conversation,
-            this.tld.resolveTLDtoAlias,
+            this.tld.resolveAliasToTLD,
             this.addressEnsSubdomain,
         );
         const hydratedConversation: Conversation = {
-            messages: undefined as any,
+            messages: new Messages(
+                this.storageApi,
+                this,
+                this.account,
+                this.profileKeys,
+                hydratedContact,
+            ),
             contact: hydratedContact,
         };
-        this.conversations.push(hydratedConversation);
+        this.list.push(hydratedConversation);
 
         return hydratedConversation;
     };
@@ -142,12 +168,12 @@ export class Conversations {
         //Dont add duplicates
         const uniqueContacts = newConversations.filter(
             (newContact) =>
-                !this.conversations.some(
+                !this.list.some(
                     (existingContact) =>
                         existingContact.contact.account.ensName ===
                         newContact.contact.account.ensName,
                 ),
         );
-        this.conversations = [...this.conversations, ...uniqueContacts];
+        this.list = [...this.list, ...uniqueContacts];
     }
 }

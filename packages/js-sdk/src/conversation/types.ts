@@ -3,11 +3,7 @@ import {
     DeliveryServiceProfile,
     getAccountDisplayName,
 } from '@dm3-org/dm3-lib-profile';
-
-class Messages {
-    public readonly list: string[];
-    public addMessage(message: string) {}
-}
+import { Messages } from '../message/Messages';
 
 export interface Contact {
     name: string;
