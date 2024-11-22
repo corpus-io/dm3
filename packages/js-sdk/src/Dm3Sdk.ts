@@ -13,6 +13,7 @@ import { StorageAPI } from '@dm3-org/dm3-lib-storage';
 import { ethers } from 'ethers';
 import { Tld } from './tld/Tld';
 import { Dm3 } from './Dm3';
+import { ITLDResolver } from './tld/nameService/ITLDResolver';
 
 /**
  * DM3SDK
@@ -36,7 +37,7 @@ export interface Dm3SdkConfig {
     userEnsSubdomain: string;
     resolverBackendUrl: string;
     backendUrl: string;
-    lukso?: ethers.providers.ExternalProvider;
+    _tld?: ITLDResolver;
 }
 
 export class Dm3Sdk {
@@ -69,6 +70,11 @@ export class Dm3Sdk {
      */
     public conversations: Conversations;
 
+    /**
+     * DM3 TLD
+     */
+    private _tld?: ITLDResolver;
+
     constructor(config: Dm3SdkConfig) {
         //TODO keep ethers v5 for know but extract into common interface later
         this.mainnetProvider = config.mainnetProvider;
@@ -78,29 +84,30 @@ export class Dm3Sdk {
         this.addressEnsSubdomain = config.addressEnsSubdomain;
         this.userEnsSubdomain = config.userEnsSubdomain;
         this.resolverBackendUrl = config.resolverBackendUrl;
-        //this.backendUrl = config.backendUrl;
-        this.lukso = config.lukso;
+        this.backendUrl = config.backendUrl;
         this.storageApi = config.storageApi;
+        this._tld = config._tld;
     }
-
-    public async universalProfileLogin() {
-        if (!this.lukso) {
-            throw new Error('Lukso provider not found');
-        }
-        const tld = new Tld(
-            this.mainnetProvider,
-            this.addressEnsSubdomain,
-            this.userEnsSubdomain,
-            this.resolverBackendUrl,
-        );
-        const lc = await LuksoConnector._instance(
-            this.lukso,
-            this.nonce,
-            this.defaultDeliveryService,
-        );
-        const loginResult = await lc.login();
-
-        const { profileKeys, profile, accountAddress } = loginResult as Success;
+    /**
+     * login can be used to login with a profile regardles the connector. Its also great for testing
+     */
+    public async login({
+        profileKeys,
+        profile,
+        accountAddress,
+    }: {
+        profileKeys: ProfileKeys;
+        profile: SignedUserProfile;
+        accountAddress: string;
+    }) {
+        const tld =
+            this._tld ??
+            new Tld(
+                this.mainnetProvider,
+                this.addressEnsSubdomain,
+                this.userEnsSubdomain,
+                this.resolverBackendUrl,
+            );
 
         this.profileKeys = profileKeys;
         this.profile = profile;
@@ -130,6 +137,7 @@ export class Dm3Sdk {
             tld,
             this.mainnetProvider,
             account,
+            profileKeys,
             this.addressEnsSubdomain,
         );
 
@@ -140,6 +148,22 @@ export class Dm3Sdk {
         ).getCloudStorage();
 
         return new Dm3(conversations, tld);
+    }
+
+    //TODO use type of injected lukso provider
+    public async universalProfileLogin(lukso: any) {
+        if (!lukso) {
+            throw new Error('Lukso provider not found');
+        }
+        const lc = await LuksoConnector._instance(
+            lukso,
+            this.nonce,
+            this.defaultDeliveryService,
+        );
+        const loginResult = await lc.login();
+
+        const { profileKeys, profile, accountAddress } = loginResult as Success;
+        return await this.login({ profileKeys, profile, accountAddress });
     }
 
     private async initializeBackendConnector(
