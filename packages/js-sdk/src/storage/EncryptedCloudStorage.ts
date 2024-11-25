@@ -18,13 +18,20 @@ export class EncryptedCloudStorage {
         account: Account,
         profileKeys: ProfileKeys,
     ) {
+        if(!account.ensName) {
+            throw new Error('Account must have an ENS name');
+        }
+
         this.backendConnector = backendConnector;
         this.account = account;
         this.profileKeys = profileKeys;
     }
 
     private async encryptSync(data: string) {
-        const accountNonce = sha256(this.account!.ensName).slice(0, 26);
+        console.log('this.account', this.account);
+        console.log('this.account.ensName', this.account.ensName);
+
+        const accountNonce = sha256(this.account.ensName).slice(0, 26);
         const encryptedPayload: EncryptedPayload = await _encrypt(
             this.profileKeys?.encryptionKeyPair?.privateKey!,
             data,
@@ -63,7 +70,7 @@ export class EncryptedCloudStorage {
     }
 
     public getCloudStorage() {
-        return getCloudStorage(this.backendConnector, this.account!.ensName, {
+        return getCloudStorage(this.backendConnector, this.account.ensName, {
             encryptAsync: this.encryptAsync,
             decryptAsync: this.decryptAsync,
             encryptSync: this.encryptSync,

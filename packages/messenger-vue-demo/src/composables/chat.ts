@@ -1,79 +1,89 @@
-import { computed, ref } from 'vue';
+import { computed, ref, markRaw, type Ref } from 'vue';
 // import { sha256, stringify } from '@dm3-org/dm3-lib-shared';
-import { Dm3Sdk, type Dm3SdkConfig } from '@dm3-org/dm3-js-sdk';
+import { Dm3, Dm3Sdk, type Dm3SdkConfig } from '@dm3-org/dm3-js-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
+import {ethers} from 'ethers';
 // import type { Dm3 } from '@dm3-org/dm3-js-sdk/lib/esm/Dm3';
 // import { DM3 } from '@dm3-org/dm3-messenger-widget';
 
-/*
-REACT_APP_ADDR_ENS_SUBDOMAIN=.testing-addr.dm3.eth
-REACT_APP_BACKEND=https://testing.dm3.network/api
-REACT_APP_DEFAULT_DELIVERY_SERVICE=testing-ds.dm3.eth
-REACT_APP_DEFAULT_SERVICE=https://testing.dm3.network/api
-REACT_APP_MAINNET_PROVIDER_RPC=https://eth-sepolia.g.alchemy.com/v2/DBATzBzSluCdFAA6Zi7YMWHpDGm1soJI
-REACT_APP_PROFILE_BASE_URL=https://testing.dm3.network/api
-REACT_APP_RESOLVER_BACKEND=https://testing.dm3.network/resolver-handler
-REACT_APP_USER_ENS_SUBDOMAIN=.testing-user.dm3.eth
-REACT_APP_PUBLIC_VAPID_KEY=
-REACT_APP_WALLET_CONNECT_PROJECT_ID=27b3e102adae76b4d4902a035da435e7
-REACT_APP_COMMIT_HASH=ce2c319
-REACT_APP_BRANCH=1106-Refine-Delivery-Service-Auth-for-Alias-names
-REACT_APP_BUILD_TIME=2024-07-29T15:11:32
-REACT_APP_ENVIRONMENT_NAME=testing
-REACT_APP_MAINNET_PROVIDER_RPC=https://eth-sepolia.g.alchemy.com/v2/DBATzBzSluCdFAA6Zi7YMWHpDGm1soJI
-REACT_APP_CHAIN_ID=11155111
-REACT_APP_NONCE=0xa1b38837dd52e70a250ac2bf3e19f1599833e9d30662bf69a1c12e5747ed9f65
-RESOLVER_ADDRESS=0x88c8cc822095cde6f92c8d20311c8e7de6a98694
-SIGNING_PUBLIC_KEY=ZUKR41erJMdNBnnQ6jNBgJDkSuMlqCKYppe0X7gZB1s=
-SIGNING_PRIVATE_KEY=/KJ9kgiuP/saDnlbcehcsihVn4CtBNMXYbc91oru7NtlQpHjV6skx00GedDqM0GAkORK4yWoIpiml7RfuBkHWw==
-SIGNER_PRIVATE_KEY=0xc13e4d81452e047728d8f878b9e4aebfcc3cc0675b18e8a64ce99ad5b1b67177
-SPAM_PROTECTION=false
-ENCRYPTION_PUBLIC_KEY=dF3KN0+T1GMO6jkgB1VDGHJHo5tm1WPMbitPpTu8jEM=
-ENCRYPTION_PRIVATE_KEY=7YHqt52A/VREF9B9q6hkm1c/5aPKBYITw/S5H28l2yI=
-RPC=https://eth-sepolia.g.alchemy.com/v2/DBATzBzSluCdFAA6Zi7YMWHpDGm1soJI
-URL=testing.dm3.network
-CERT_MAIL=malteish+certbot@dm3.org
-DATABASE_URL=postgresql://prisma:prisma@dm3-storage:5432/dm3
-RESOLVER_SUPPORTED_ADDR_ENS_SUBDOMAINS='["testing-addr.dm3.eth" ,"subtesting-addr.dm3.eth" ]'
-RESOLVER_SUPPORTED_NAME_ENS_SUBDOMAINS='["testing-user.dm3.eth" ,"subtesting-name.dm3.eth" ]'
-PERSISTENCE_DIRECTORY=/mnt/dm3_prod_volume
-*/
+const sepoliaProvider = new ethers.providers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cBTHRhVcZ3Vt4BOFpA_Hi5DcTB1KQQV1", {
+    name: 'sepolia',
+    chainId: 11155111,
+    ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+});
 
-const config: Dm3SdkConfig = {
-    mainnetProvider: new JsonRpcProvider('https://eth-sepolia.g.alchemy.com/v2/DBATzBzSluCdFAA6Zi7YMWHpDGm1soJI'), // 'https://rpc.lukso.network'
-    nonce: '0x0', // TODO why not hex?
-    defaultDeliveryService: 'testing-ds.dm3.eth',
-    addressEnsSubdomain: 'testing-addr.dm3.eth',
-    userEnsSubdomain: 'testing-user.dm3.eth',
-    resolverBackendUrl: 'https://testing.dm3.network/resolver-handler',
-    backendUrl: 'https://testing.dm3.network/api',
-    storageApi: {
-        getConversations: () => Promise.resolve([]),
-        getMessages: () => Promise.resolve([]),
-        getHaltedMessages: () => Promise.resolve([]),
-        clearHaltedMessages: () => Promise.resolve(),
-        addMessageBatch: () => Promise.resolve(''),
-        addConversation: () => Promise.resolve(),
-        getNumberOfMessages: () => Promise.resolve(0),
-        getNumberOfConverations: () => Promise.resolve(0),
-        editMessageBatch: () => Promise.resolve(),
-        addMessage: () => Promise.resolve(''),
-        toggleHideConversation: () => Promise.resolve(),
-    },
+const configLukso: Dm3SdkConfig = {
+    mainnetProvider: sepoliaProvider,
+    nonce: '0xa1b38837dd52e70a250ac2bf3e19f1599833e9d30662bf69a1c12e5747ed9f65', // This will be the current timestamp
+    defaultDeliveryService: "testing-ds.dm3.eth",
+    addressEnsSubdomain: ".testing-addr.dm3.eth",
+    userEnsSubdomain: ".testing-user.dm3.eth",
+    resolverBackendUrl: "https://testing.dm3.network/resolver-handler",
+    backendUrl: "https://testing.dm3.network/api",
+    // storageApi: {
+    //     getConversations: () => Promise.resolve([]),
+    //     getMessages: () => Promise.resolve([]),
+    //     getHaltedMessages: () => Promise.resolve([]),
+    //     clearHaltedMessages: () => Promise.resolve(),
+    //     addMessageBatch: () => Promise.resolve(''),
+    //     addConversation: () => Promise.resolve(),
+    //     getNumberOfMessages: () => Promise.resolve(0),
+    //     getNumberOfConverations: () => Promise.resolve(0),
+    //     editMessageBatch: () => Promise.resolve(),
+    //     addMessage: () => Promise.resolve(''),
+    //     toggleHideConversation: () => Promise.resolve(),
+    // },
 };
 
-const sdk = new Dm3Sdk(config);
+const sdk = new Dm3Sdk(configLukso);
 
-export function useDm3Chat() {
-    const dm3Instance = ref<any | null>(null);
+// https://docs.lukso.tech/install-up-browser-extension/
+
+type UseDm3ChatReturnType = {
+    rooms: Ref; // TODO: fix types
+    messages: Ref; // TODO: fix types
+    init: () => Promise<void>;
+    startTestConversation: () => Promise<void>;
+    isReady: Ref<boolean>;
+};
+
+export function useDm3Chat(): UseDm3ChatReturnType {
+    const dm3Instance = ref<Dm3 | null>(null);
+    const isReady = ref(false);
     const init = async () => {
-        const dm3 = await sdk.universalProfileLogin();
-        // const dm3 = {};
-        dm3Instance.value = dm3;
+        console.log('dm3Instance', dm3Instance.value);
+        
+        // Listen for provider announcements
+        window.addEventListener("eip6963:announceProvider", async (event) => {
+            const dm3 = await sdk.universalProfileLogin((event as any).detail.provider);
+            // mark as raw to avoid reactivity issues with vue
+            // see: https://github.com/vuejs/core/issues/3024
+            dm3Instance.value = markRaw(dm3);
+            console.log('dm3Instance', dm3Instance.value);
+            isReady.value = true;
+        });
+        
+        // Request installed providers
+        window.dispatchEvent(new Event("eip6963:requestProvider"));
     };
     // init();
 
-    const rooms = computed(() => dm3Instance.value?.conversations?.conversations);
-    const messages = ref(rooms.value?.at(0));
-    return { rooms, messages, init };
+    const rooms = computed(() => {
+        console.log('dm3Instance.value?.conversations list', dm3Instance.value?.conversations.list);
+        return dm3Instance.value?.conversations?.list;
+    });
+    const messages = computed(() => rooms.value?.at(0));
+
+    const startTestConversation = async () => {
+        console.log('dm3Instance', dm3Instance.value);
+        console.log('dm3Instance.value?.conversations', dm3Instance.value?.conversations);
+        const conv = await dm3Instance.value?.conversations?.addConversation('alice.eth');
+        console.log('conv', conv);
+        console.log('conv?.messages', conv?.messages.meta);
+        console.log('conv?.contact', conv?.contact);
+        await conv?.messages.sendMessage('Hello, world!');
+        console.log('messages', messages.value);
+    }
+
+    return { rooms, messages, isReady, init, startTestConversation };
 }

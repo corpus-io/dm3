@@ -25,11 +25,16 @@ export default defineConfig({
   },
   // due to built of libs with "module": "CommonJS", instead of "ESNext", we need to force pre-bundle them
   optimizeDeps: {
-    include: ['@dm3-org/dm3-js-sdk'],
+    include: ['@dm3-org/dm3-js-sdk', '@dm3-org/dm3-lib-crypto', 'dm3-org/dm3-lib-profile'],
   },
   build: {
     commonjsOptions: {
-      include: [/node_modules/, '@dm3-org/dm3-js-sdk'], // Ensure your library is included in CommonJS handling
+       // Ensure your library is included in CommonJS handling
+      include: [/node_modules/, 
+        /@dm3-org\/dm3-js-sdk/, 
+        /@dm3-org\/dm3-lib-crypto/, 
+        /dm3-org\/dm3-lib-profile/
+      ],
     },
   },
 })

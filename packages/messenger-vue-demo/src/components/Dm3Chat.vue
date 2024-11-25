@@ -1,12 +1,16 @@
 <template>
-    <vue-advanced-chat 
+    {{ rooms }}
+    {{ messages }}
+    <!-- <vue-advanced-chat 
         :current-user-id="currentUserId" 
         :rooms="JSON.stringify(rooms)"
         :messages="JSON.stringify(messages)" 
         :room-actions="JSON.stringify(roomActions)" 
         :messages-loaded="messagesLoaded"
         :rooms-loaded="roomsLoaded"
-    />
+    /> -->
+    <button @click="startTestConversation">Start test conversation</button>
+    isReady: {{ isReady }}
 </template>
 
 <script setup>
@@ -18,9 +22,11 @@ register()
 const roomsLoaded = ref(false);
 const messagesLoaded = ref(false);
 
-const { rooms, messages, init } = useDm3Chat();
+const { rooms, messages, init, startTestConversation, isReady } = useDm3Chat();
 
-init();
+onMounted(() => {
+    init();
+})
 
 const currentUserId = '1234'
 // const rooms = [

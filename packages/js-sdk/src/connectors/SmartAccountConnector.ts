@@ -142,20 +142,24 @@ export class SmartAccountConnector {
 
     public async login(): Promise<LoginResult> {
         const keyStore = await this.keyStoreService.readDm3KeyStore();
+        console.log('keyStore', keyStore);
         //Smart account has never used dm3 before
         if (Object.keys(keyStore).length === 0) {
+            console.log('signUp');
             return await this.signUp();
         }
         //Smart account has used Dm before. We have to check if the controller has published its public key yet
-        const { encryptionKeyPair, signature } =
-            await this.createEncryptionKeys();
+        console.debug('Starting login process for existing smart account.');
+        const { encryptionKeyPair, signature } = await this.createEncryptionKeys();
+        console.debug('Encryption keys created:', encryptionKeyPair, 'Signature:', signature);
 
         //Recover the address of the controller from the signature
-        const upControllerAddress =
-            await this.recoverAddressFromEncryptionKeySignature(signature);
+        const upControllerAddress = await this.recoverAddressFromEncryptionKeySignature(signature);
+        console.debug('Recovered UP controller address from signature:', upControllerAddress);
 
-        //Check if the controller has already a ketStore entry
+        //Check if the controller has already a keyStore entry
         const encryptedControllerKeyStore = keyStore[upControllerAddress];
+        console.debug('Retrieved encrypted controller key store:', encryptedControllerKeyStore);
 
         //If the controller already has a keyStore, we can decrypt the profileKeys using its encryptionKeys
         //If not we've to start the keyExchange process
@@ -163,9 +167,11 @@ export class SmartAccountConnector {
             !encryptedControllerKeyStore ||
             !encryptedControllerKeyStore.encryptedProfileKeys
         ) {
-            //The signer connected to the UP has not  used dm3 before, it has to publish its public key so another device can share the profile keys
+            console.debug('No existing key store or encrypted profile keys found. Initiating key exchange process.');
+            //The signer connected to the UP has not used dm3 before, it has to publish its public key so another device can share the profile keys
             return await this.addNewSigner(keyStore);
         }
+        console.debug('Existing key store and encrypted profile keys found. Proceeding with sign-in for existing signer.');
         //The signer connected to the UP has already used dm3 before, hence it knows the profile
         return await this.signInExistingSigner(
             encryptionKeyPair,
@@ -222,15 +228,22 @@ export class SmartAccountConnector {
 
     //Returns Keys to encrypt the actual profile at UP
     private async createEncryptionKeys() {
-        //If the user has created its encryption keys before, we can reuse them. That way we don't have to ask the user to sign again
+        // If the user has created its encryption keys before, we can reuse them. That way we don't have to ask the user to sign again
+        console.debug('Checking for cached encryption keys.');
         if (this.cachedEncryptionKeys) {
+            console.debug('Cached encryption keys found, returning them.');
             return this.cachedEncryptionKeys;
         }
+        
+        console.debug('No cached encryption keys found, proceeding to create new ones.');
         const upAddress = await this.keyStoreService.getAccountAddress();
+        console.debug('Retrieved account address:', upAddress);
+        
         const statement =
             `Connect the DM3 MESSENGER with your wallet. ` +
             `Keys for secure communication are derived from this signature.` +
             `(There is no paid transaction initiated. The signature is used off-chain only.)`;
+        console.debug('Prepared statement for SiweMessage:', statement);
 
         const message = new SiweMessage({
             domain: 'dm3.chat',
@@ -240,23 +253,31 @@ export class SmartAccountConnector {
             version: '1',
             chainId: 42,
             nonce: this.nonce,
-            //Date is a mandatory property otherwise it'll be DAte.now(). We need it to be constant to create teh encryption keys deterministically
+            // Date is a mandatory property otherwise it'll be Date.now(). We need it to be constant to create the encryption keys deterministically
             issuedAt: new Date(978307200000).toISOString(),
             resources: ['https://dm3.network'],
         });
+        console.debug('Created SiweMessage:', message);
+        console.debug('this.controller:', this.controller);
+        console.debug('message.prepareMessage():', message.prepareMessage());
 
         const signature = await this.controller.signMessage(
             message.prepareMessage(),
         );
+        console.debug('Generated signature:', signature);
+
         const storageKey = await createStorageKey(signature);
+        console.debug('Created storage key:', storageKey);
 
         const keys = await _createProfileKeys(storageKey, this.nonce);
+        console.debug('Generated profile keys:', keys);
 
-        //Keep the encryptionKeyPair for later use
+        // Keep the encryptionKeyPair for later use
         this.cachedEncryptionKeys = {
             encryptionKeyPair: keys.encryptionKeyPair,
             signature: signature,
         };
+        console.debug('Cached encryption keys for future use.');
 
         return {
             encryptionKeyPair: keys.encryptionKeyPair,

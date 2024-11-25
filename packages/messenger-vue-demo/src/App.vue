@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Chat from './components/Chat.vue'
+import Chat from './components/Dm3Chat.vue'
 </script>
 
 <template>

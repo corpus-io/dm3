@@ -44,6 +44,14 @@ export class Messages {
         this._messages = [];
     }
 
+    get meta() {
+        return {
+            sender: this.senderAccount,
+            receiver: this.receiver,
+            messages: this._messages,
+        }
+    }
+
     public get list() {
         return renderMessage(this._messages);
     }

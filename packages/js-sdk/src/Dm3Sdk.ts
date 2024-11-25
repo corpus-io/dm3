@@ -30,7 +30,7 @@ export function getIdForAddress(address: string, addrEnsSubdomain: string) {
 
 export interface Dm3SdkConfig {
     mainnetProvider: ethers.providers.JsonRpcProvider;
-    storageApi: StorageAPI;
+    storageApi?: StorageAPI;
     nonce: string;
     defaultDeliveryService: string;
     addressEnsSubdomain: string;
@@ -63,7 +63,7 @@ export class Dm3Sdk {
     /**
      * DM3 STORAGE
      */
-    private storageApi: StorageAPI;
+    private storageApi?: StorageAPI;
 
     /**
      * DM3 CONVERSATIONS
@@ -85,8 +85,8 @@ export class Dm3Sdk {
         this.userEnsSubdomain = config.userEnsSubdomain;
         this.resolverBackendUrl = config.resolverBackendUrl;
         this.backendUrl = config.backendUrl;
-        this.storageApi = config.storageApi;
         this._tld = config._tld;
+        this.storageApi = config.storageApi;
     }
     /**
      * login can be used to login with a profile regardles the connector. Its also great for testing
@@ -132,6 +132,14 @@ export class Dm3Sdk {
 
         await beConnector.login(profile);
 
+        this.storageApi = this.storageApi ?? new EncryptedCloudStorage(
+            beConnector,
+            account,
+            this.profileKeys,
+        ).getCloudStorage();
+
+        console.log('this.storageApi', this.storageApi);
+
         const conversations = new Conversations(
             this.storageApi,
             tld,
@@ -140,12 +148,6 @@ export class Dm3Sdk {
             profileKeys,
             this.addressEnsSubdomain,
         );
-
-        this.storageApi = new EncryptedCloudStorage(
-            beConnector,
-            account,
-            this.profileKeys,
-        ).getCloudStorage();
 
         return new Dm3(conversations, tld);
     }
@@ -160,7 +162,11 @@ export class Dm3Sdk {
             this.nonce,
             this.defaultDeliveryService,
         );
+
+        console.log('lc', lc, typeof lc.login);
         const loginResult = await lc.login();
+
+        console.log('loginResult', loginResult);
 
         const { profileKeys, profile, accountAddress } = loginResult as Success;
         return await this.login({ profileKeys, profile, accountAddress });
