@@ -15,19 +15,18 @@ import { sha256, stringify } from '@dm3-org/dm3-lib-shared';
 import { StorageAPI } from '@dm3-org/dm3-lib-storage';
 import { submitEnvelopsToReceiversDs } from '../api/ds/submitEnvelopsToReceiversDs';
 import { Conversations } from '../conversation/Conversations';
-import { Contact } from '../conversation/types';
+import { Contact, Conversation } from '../conversation/types';
 import { renderMessage } from './renderer/renderMessage';
 import { MessageModel, MessageSource } from './types';
 
 export class Messages {
     private readonly storageApi: StorageAPI;
-    private readonly conversations: Conversations;
-
+    private readonly contacts: Contact[];
     private readonly _messages: MessageModel[];
-
     private readonly senderAccount: Account;
     private readonly senderProfileKeys: ProfileKeys;
     private readonly receiver: Contact;
+    private hydrateFn: (contact: Contact) => Promise<Conversation>;
 
     constructor(
         storageApi: StorageAPI,
@@ -37,11 +36,13 @@ export class Messages {
         receiver: Contact,
     ) {
         this.storageApi = storageApi;
-        this.conversations = conversations;
+        this.contacts = conversations.list.map((c) => c.contact);
         this.senderAccount = senderAccount;
         this.senderProfileKeys = senderProfileKeys;
         this.receiver = receiver;
         this._messages = [];
+        // TODO: can we make this a pure/static to reduce complexity?
+        this.hydrateFn = conversations.hydrateExistingContactAsync;
     }
 
     get meta() {
@@ -90,21 +91,22 @@ export class Messages {
         }
 
         //Find the recipient of the message in the contact list
-        const recipient = this.conversations.list.find(
-            (c) => c.contact.account.ensName === contact,
+        const recipient = this.contacts.find(
+            // #needed
+            (c) => c.account.ensName === contact,
         );
         /**
          * Check if the recipient has a PublicEncrptionKey
          * if not only keep the msg at the senders storage
          */
         const recipientIsDm3User =
-            !!recipient?.contact.account.profile?.publicEncryptionKey;
+            !!recipient?.account.profile?.publicEncryptionKey;
 
         //If the recipient is a dm3 user we can send the message to the delivery service
         if (recipientIsDm3User) {
             return await this._dispatchMessage(
                 contact,
-                recipient.contact,
+                recipient,
                 message,
             );
         }
@@ -112,17 +114,16 @@ export class Messages {
         //There are cases were a messages is already to be send even though the contract hydration is not finished yet.
         //This happens if a message has been picked up from the delivery service and the clients sends READ_RECEIVE or READ_OPENED acknowledgements
         //In that case we've to check again to the if the user is a DM3 user, before we decide to keep the message
-        const potentialReceiver = this.conversations.list.find(
-            (c) => c.contact.account.ensName === contact,
+        const potentialReceiver = this.contacts.find(
+            // #needed
+            (c) => c.account.ensName === contact,
         );
 
         //This should normally not happen, since the contact should be already in the contact list
         if (!potentialReceiver) {
             return await this._haltMessage(contact, message);
         }
-        const hydratedC = await this.conversations.hydrateExistingContactAsync(
-            potentialReceiver.contact,
-        );
+        const hydratedC = await this.hydrateFn(potentialReceiver);
 
         //If the user is a DM3 user we can send the message to the delivery service
         if (hydratedC.contact.account.profile?.publicEncryptionKey) {
