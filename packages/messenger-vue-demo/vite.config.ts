@@ -33,7 +33,8 @@ export default defineConfig({
       include: [/node_modules/, 
         /@dm3-org\/dm3-js-sdk/, 
         /@dm3-org\/dm3-lib-crypto/, 
-        /dm3-org\/dm3-lib-profile/
+        /dm3-org\/dm3-lib-profile/,
+        /@dm3-org\/dm3-lib-storage/,
       ],
     },
   },

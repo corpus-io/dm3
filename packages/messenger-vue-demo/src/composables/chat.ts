@@ -1,10 +1,6 @@
 import { computed, ref, markRaw, type Ref } from 'vue';
-// import { sha256, stringify } from '@dm3-org/dm3-lib-shared';
 import { Dm3, Dm3Sdk, type Dm3SdkConfig } from '@dm3-org/dm3-js-sdk';
-import { JsonRpcProvider } from '@ethersproject/providers';
 import {ethers} from 'ethers';
-// import type { Dm3 } from '@dm3-org/dm3-js-sdk/lib/esm/Dm3';
-// import { DM3 } from '@dm3-org/dm3-messenger-widget';
 
 const sepoliaProvider = new ethers.providers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cBTHRhVcZ3Vt4BOFpA_Hi5DcTB1KQQV1", {
     name: 'sepolia',
@@ -20,23 +16,11 @@ const configLukso: Dm3SdkConfig = {
     userEnsSubdomain: ".testing-user.dm3.eth",
     resolverBackendUrl: "https://testing.dm3.network/resolver-handler",
     backendUrl: "https://testing.dm3.network/api",
-    // storageApi: {
-    //     getConversations: () => Promise.resolve([]),
-    //     getMessages: () => Promise.resolve([]),
-    //     getHaltedMessages: () => Promise.resolve([]),
-    //     clearHaltedMessages: () => Promise.resolve(),
-    //     addMessageBatch: () => Promise.resolve(''),
-    //     addConversation: () => Promise.resolve(),
-    //     getNumberOfMessages: () => Promise.resolve(0),
-    //     getNumberOfConverations: () => Promise.resolve(0),
-    //     editMessageBatch: () => Promise.resolve(),
-    //     addMessage: () => Promise.resolve(''),
-    //     toggleHideConversation: () => Promise.resolve(),
-    // },
 };
 
 const sdk = new Dm3Sdk(configLukso);
 
+// TODO: check for installed extension
 // https://docs.lukso.tech/install-up-browser-extension/
 
 type UseDm3ChatReturnType = {
@@ -47,42 +31,42 @@ type UseDm3ChatReturnType = {
     isReady: Ref<boolean>;
 };
 
+const requestProvider = (): Promise<ethers.providers.ExternalProvider> => {
+    return new Promise((resolve) => {
+        window.addEventListener("eip6963:announceProvider", (event) => {
+            const provider = (event as any).detail.provider;
+            console.log('Provider:', provider);
+            resolve(provider);
+        });
+
+        // Request installed providers
+        window.dispatchEvent(new Event("eip6963:requestProvider"));
+    });
+};
+
 export function useDm3Chat(): UseDm3ChatReturnType {
     const dm3Instance = ref<Dm3 | null>(null);
     const isReady = ref(false);
     const init = async () => {
-        console.log('dm3Instance', dm3Instance.value);
-        
-        // Listen for provider announcements
-        window.addEventListener("eip6963:announceProvider", async (event) => {
-            const dm3 = await sdk.universalProfileLogin((event as any).detail.provider);
-            // mark as raw to avoid reactivity issues with vue
-            // see: https://github.com/vuejs/core/issues/3024
-            dm3Instance.value = markRaw(dm3);
-            console.log('dm3Instance', dm3Instance.value);
-            isReady.value = true;
-        });
-        
-        // Request installed providers
-        window.dispatchEvent(new Event("eip6963:requestProvider"));
+        const dm3 = await sdk.universalProfileLoginWithCache(requestProvider);
+        dm3Instance.value = markRaw(dm3);
+        isReady.value = true;
     };
-    // init();
 
     const rooms = computed(() => {
         console.log('dm3Instance.value?.conversations list', dm3Instance.value?.conversations.list);
-        return dm3Instance.value?.conversations?.list;
+        return dm3Instance.value?.conversations?.list
     });
     const messages = computed(() => rooms.value?.at(0));
 
     const startTestConversation = async () => {
-        console.log('dm3Instance', dm3Instance.value);
-        console.log('dm3Instance.value?.conversations', dm3Instance.value?.conversations);
+        if (!dm3Instance) {
+            console.error('dm3Instance is not initialized');
+            return;
+        }
+
         const conv = await dm3Instance.value?.conversations?.addConversation('alice.eth');
-        console.log('conv', conv);
-        console.log('conv?.messages', conv?.messages.meta);
-        console.log('conv?.contact', conv?.contact);
         await conv?.messages.sendMessage('Hello, world!');
-        console.log('messages', messages.value);
     }
 
     return { rooms, messages, isReady, init, startTestConversation };

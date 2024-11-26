@@ -63,7 +63,7 @@ export class Dm3Sdk {
     /**
      * DM3 STORAGE
      */
-    private storageApi?: StorageAPI;
+    public storageApi?: StorageAPI;
 
     /**
      * DM3 CONVERSATIONS
@@ -160,8 +160,36 @@ export class Dm3Sdk {
         return new Dm3(conversations, tld);
     }
 
-    //TODO use type of injected lukso provider
-    public async universalProfileLogin(lukso: any) {
+    /**
+     * Convenience method to login with a cached provider. 
+     * DO NOT USE IN PRODUCTION since it stores the keys in the local storage!
+     * @param lukso 
+     * @returns 
+     */
+    public async universalProfileLoginWithCache(requestProvider: () => Promise<ethers.providers.ExternalProvider>) {
+        const cachedCredentials = localStorage.getItem('credentials');
+        
+        if (cachedCredentials) {
+            const credentials = JSON.parse(cachedCredentials);
+            return this.login(credentials);
+        }
+
+        const lukso = await requestProvider();
+        if (!lukso) {
+            throw new Error('Lukso provider not found');
+        }
+        const lc = await LuksoConnector._instance(
+            lukso,
+            this.nonce,
+            this.defaultDeliveryService,
+        );
+        
+        const loginResult = await lc.login();
+        localStorage.setItem('credentials', JSON.stringify(loginResult));
+        return this.login(loginResult as Success);
+    }
+
+    public async universalProfileLogin(lukso: ethers.providers.ExternalProvider) {
         if (!lukso) {
             throw new Error('Lukso provider not found');
         }
