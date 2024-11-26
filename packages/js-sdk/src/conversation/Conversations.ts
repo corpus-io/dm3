@@ -40,6 +40,16 @@ export class Conversations {
         this.list = [];
     }
 
+    public async _init() {
+        const conversations = await this.storageApi.getConversations(10, 0);
+        await Promise.all(
+            conversations.map((conversation) =>
+                this._addConversation(conversation),
+            ),
+        );
+        console.log('tinit done');
+    }
+
     public async addConversation(_ensName: string) {
         const contactTldName = normalizeEnsName(_ensName);
 

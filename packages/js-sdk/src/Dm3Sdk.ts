@@ -100,6 +100,8 @@ export class Dm3Sdk {
         profile: SignedUserProfile;
         accountAddress: string;
     }) {
+        console.log('hello sdk');
+
         const tld =
             this._tld ??
             new Tld(
@@ -131,14 +133,19 @@ export class Dm3Sdk {
         );
 
         await beConnector.login(profile);
-
-        this.storageApi = this.storageApi ?? new EncryptedCloudStorage(
+        const encCS = new EncryptedCloudStorage(
             beConnector,
             account,
             this.profileKeys,
-        ).getCloudStorage();
+        );
+        console.log('encCS', encCS.account);
+        this.storageApi = encCS.getCloudStorage();
 
         console.log('this.storageApi', this.storageApi);
+        console.log(
+            'SAPI account',
+            (this.storageApi as unknown as EncryptedCloudStorage).account,
+        );
 
         const conversations = new Conversations(
             this.storageApi,
@@ -148,6 +155,7 @@ export class Dm3Sdk {
             profileKeys,
             this.addressEnsSubdomain,
         );
+        await conversations._init();
 
         return new Dm3(conversations, tld);
     }
@@ -163,7 +171,7 @@ export class Dm3Sdk {
             this.defaultDeliveryService,
         );
 
-        console.log('lc', lc, typeof lc.login);
+        console.log('lcgoo', lc, typeof lc.login);
         const loginResult = await lc.login();
 
         console.log('loginResult', loginResult);

@@ -9,16 +9,16 @@ import {
     encryptAsymmetric,
 } from '@dm3-org/dm3-lib-crypto';
 export class EncryptedCloudStorage {
-    private backendConnector: IBackendConnector;
-    private account: Account;
-    private profileKeys: ProfileKeys;
+    private readonly backendConnector: IBackendConnector;
+    public readonly account: Account;
+    private readonly profileKeys: ProfileKeys;
 
     constructor(
         backendConnector: IBackendConnector,
         account: Account,
         profileKeys: ProfileKeys,
     ) {
-        if(!account.ensName) {
+        if (!account.ensName) {
             throw new Error('Account must have an ENS name');
         }
 
