@@ -28,9 +28,6 @@ export class EncryptedCloudStorage {
     }
 
     private async encryptSync(data: string) {
-        console.log('this.account', this.account);
-        console.log('this.account.ensName', this.account.ensName);
-
         const accountNonce = sha256(this.account.ensName).slice(0, 26);
         const encryptedPayload: EncryptedPayload = await _encrypt(
             this.profileKeys?.encryptionKeyPair?.privateKey!,
@@ -70,11 +67,11 @@ export class EncryptedCloudStorage {
     }
 
     public getCloudStorage() {
-        return getCloudStorage(this.backendConnector, this.account.ensName, {
-            encryptAsync: this.encryptAsync,
-            decryptAsync: this.decryptAsync,
-            encryptSync: this.encryptSync,
-            decryptSync: this.decryptSync,
+        return getCloudStorage(this.backendConnector, this.account!.ensName, {
+            encryptAsync: this.encryptAsync.bind(this),
+            decryptAsync: this.decryptAsync.bind(this),
+            encryptSync: this.encryptSync.bind(this),
+            decryptSync: this.decryptSync.bind(this),
         });
     }
 }
