@@ -45,17 +45,24 @@ export class Messages {
         this.hydrateFn = conversations.hydrateExistingContactAsync;
     }
 
-    get meta() {
-        return {
-            sender: this.senderAccount,
-            receiver: this.receiver,
-            messages: this._messages,
-        }
-    }
-
-    public get list() {
+    get list() {
         return renderMessage(this._messages);
     }
+
+    public async init() {
+        const messagesContainer = await this.storageApi.getMessages(this.receiver.account.ensName, 10, 0);
+
+        const storedMessages = messagesContainer.map((message) =>
+            ({
+                ...message,
+                reactions: [],
+                source: MessageSource.Storage,
+            } as MessageModel),
+        );
+
+        this._messages.push(...storedMessages);
+    }
+
     public async sendMessage(msg: string) {
         const messageWithoutSig: Omit<Message, 'signature'> = {
             message: msg,
