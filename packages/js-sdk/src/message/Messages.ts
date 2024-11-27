@@ -49,6 +49,10 @@ export class Messages {
         return renderMessage(this._messages);
     }
 
+    get participants() {
+        return this.contacts;
+    }
+
     public async init() {
         const messagesContainer = await this.storageApi.getMessages(this.receiver.account.ensName, 10, 0);
 
