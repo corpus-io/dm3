@@ -165,3 +165,8 @@ jobs:
               run: |
                   ssh -i ./ssh-key app@${{ vars.HOST_DOMAIN }} "\
                   cd dm3 && docker compose --env-file .env up -d && docker system prune -af"
+            - name: Create cronjob for certbot
+              run: |
+                  ssh -i ./ssh-key root@${{ vars.HOST_DOMAIN }} "\
+                  (crontab -l 2>/dev/null | grep -q 'certbot renew --quiet' || \
+                  (crontab -l 2>/dev/null; echo '0 0 * * * certbot renew --quiet') | crontab -)"
