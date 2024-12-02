@@ -2,7 +2,7 @@ import { computed, ref, markRaw, type Ref } from 'vue';
 import { Dm3, Dm3Sdk, type Dm3SdkConfig } from '@dm3-org/dm3-js-sdk';
 import {ethers} from 'ethers';
 import type { Conversation } from '@dm3-org/dm3-lib-storage';
-import { transformToMessages, transformToRooms } from '@/chatUtils';
+import { transformToMessages, transformToRooms, type ChatRoom } from '@/chatUtils';
 import { computedAsync } from '@vueuse/core';
 
 const sepoliaProvider = new ethers.providers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cBTHRhVcZ3Vt4BOFpA_Hi5DcTB1KQQV1", {
@@ -29,7 +29,6 @@ const sdk = new Dm3Sdk(configLukso);
 type UseDm3ChatReturnType = {
     loggedInAccount: Ref<string | null>;
     fetchMessages: (room, options) => Promise<void>;
-    getConversations: () => any[]; // TODO: fix types
     messages: Ref; // TODO: fix types
     init: () => Promise<void>;
     startTestConversation: () => Promise<void>;
@@ -37,6 +36,9 @@ type UseDm3ChatReturnType = {
     conversationsPreview: Ref<any[]>;
     selectedConversation: Ref<Conversation | null>;
     sendMessage: (message: any) => Promise<void>;
+    rooms: Ref<ChatRoom[] | undefined>;
+    roomsLoaded: Ref<boolean>;
+    messagesLoaded: Ref<boolean>;
 };
 
 const requestProvider = (): Promise<ethers.providers.ExternalProvider> => {
@@ -100,9 +102,27 @@ export function useDm3Chat(): UseDm3ChatReturnType {
 
         messages.value = transformToMessages(conversationsPreview.value
             .find((c) => c.contact.account.ensName === room.roomId)
-            ?.messages.list || []);
+            ?.messages.list.sort((a, b) => a.envelop.message.metadata.timestamp - b.envelop.message.metadata.timestamp)
+             || []);
 
         messagesLoaded.value = true;
+    }
+
+    const _updateMessages = async (roomId: string) => {
+        const convs = dm3Instance.value?.conversations.list || [];
+
+        console.log('convs', convs);
+
+        await Promise.all(convs.map((conv) => {
+            return conv.messages.init();
+        }));
+
+        console.log('convs initilaized', convs);
+
+        messages.value = transformToMessages(convs
+            .find((c) => c.contact.account.ensName === roomId)
+            ?.messages.list.sort((a, b) => a.envelop.message.metadata.timestamp - b.envelop.message.metadata.timestamp)
+             || []);
     }
 
     const sendMessage = async ({content, roomId, replyMessage, files, usersTag}) => {
@@ -115,6 +135,7 @@ export function useDm3Chat(): UseDm3ChatReturnType {
 
         const conv = await dm3Instance.value?.conversations?.addConversation(roomId);
         await conv?.messages.sendMessage(content);
+        _updateMessages(roomId);
     }
 
     return {
@@ -129,6 +150,6 @@ export function useDm3Chat(): UseDm3ChatReturnType {
         init, 
         startTestConversation, 
         conversationsPreview, 
-        selectedConversation 
+        selectedConversation
     };
 }

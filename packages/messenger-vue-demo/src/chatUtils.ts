@@ -67,7 +67,7 @@ export type ChatRoom = {
           saved: lastMessage?.indicator === MessageIndicator.RECEIVED,
           distributed: lastMessage?.indicator === MessageIndicator.SENT,
           seen: lastMessage?.indicator === MessageIndicator.READED,
-          new: lastMessage?.indicator !== MessageIndicator.READED,
+          new: lastMessage?.indicator !== MessageIndicator.READED, // TODO: and not my own message
         },
         users: allParticipants,
         typingUsers: [], // Default empty
@@ -86,6 +86,7 @@ export type ChatRoom = {
       const senderId = message.envelop.message.metadata.from ? String(message.envelop.message.metadata.from) : "unknown_sender";
 
       return {
+        new: false,
         _id: _id,
         indexId: message.indexId || null, // Assuming indexId is available or null
         content: message.envelop.message.message || "No content",
@@ -97,7 +98,8 @@ export type ChatRoom = {
         system: message.system || false,
         saved: message.indicator === MessageIndicator.RECEIVED,
         distributed: message.indicator === MessageIndicator.SENT,
-        seen: message.indicator === MessageIndicator.READED,
+        // seen: message.indicator === MessageIndicator.READED, // TODO: and not my own message
+        seen: true,
         deleted: message.deleted || false,
         failure: message.failure || false,
         disableActions: message.disableActions || false,
