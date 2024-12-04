@@ -22,6 +22,7 @@ export class Conversations {
     private readonly account: Account;
     private readonly profileKeys: ProfileKeys;
     public list: Conversation[];
+    private callback: (event: string, eventData: any) => void;
 
     constructor(
         storageApi: StorageAPI,
@@ -30,6 +31,7 @@ export class Conversations {
         account: Account,
         profileKeys: ProfileKeys,
         addressEnsSubdomain: string,
+        callback: (event: string, eventData: any) => void,
     ) {
         this.storageApi = storageApi;
         this.tld = tld;
@@ -38,6 +40,7 @@ export class Conversations {
         this.addressEnsSubdomain = addressEnsSubdomain;
         this.profileKeys = profileKeys;
         this.list = [];
+        this.callback = callback;
     }
 
     public async _init() {
@@ -51,6 +54,7 @@ export class Conversations {
     }
 
     public async addConversation(_ensName: string) {
+        this.callback('start_add_conversation', { ensName: _ensName });
         const contactTldName = normalizeEnsName(_ensName);
 
         const aliasName = await this.tld.resolveTLDtoAlias(contactTldName);
@@ -65,6 +69,7 @@ export class Conversations {
         const conversationPreview = this._addConversation(newConversation);
         //Add the contact to the storage in the background
         this.storageApi.addConversation(aliasName, [contactTldName]);
+        this.callback('finalise_add_conversation', { ensName: _ensName });
         return conversationPreview;
     }
 
@@ -170,7 +175,7 @@ export class Conversations {
             contact: hydratedContact,
         };
         this.list.push(hydratedConversation);
-
+        this.callback('add_message', { ensName: contact.account.ensName });
         return hydratedConversation;
     };
 

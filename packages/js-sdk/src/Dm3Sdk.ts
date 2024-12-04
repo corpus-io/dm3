@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import {
     normalizeEnsName,
     ProfileKeys,
@@ -12,7 +13,7 @@ import { BackendConnector } from './api/BackendConnector';
 import { StorageAPI } from '@dm3-org/dm3-lib-storage';
 import { ethers } from 'ethers';
 import { Tld } from './tld/Tld';
-import { Dm3 } from './Dm3';
+// import { Dm3 } from './Dm3';
 import { ITLDResolver } from './tld/nameService/ITLDResolver';
 
 /**
@@ -40,7 +41,7 @@ export interface Dm3SdkConfig {
     _tld?: ITLDResolver;
 }
 
-export class Dm3Sdk {
+export class Dm3Sdk extends EventEmitter {
     private readonly mainnetProvider: ethers.providers.JsonRpcProvider;
     private readonly lukso?: ethers.providers.ExternalProvider;
 
@@ -70,12 +71,38 @@ export class Dm3Sdk {
      */
     public conversations: Conversations;
 
+    private _selectedConversationId: string;
+
+    getConversations() {
+        return this.conversations;
+    }
+
+    getMessagesByConversation(ensName?: string) {
+        if (ensName) {
+            this._selectedConversationId = ensName;
+        }
+        
+        if (!this._selectedConversationId) {
+            throw new Error('No conversation selected');
+        }
+
+        // TODO: ens name might not be the best option to identify the conversation, we should introduce some id
+        const selectedConversation = this.conversations.list.find(c => c.contact.account.ensName === this._selectedConversationId);
+        
+        if (!selectedConversation) {
+            throw new Error('Selected conversation not found');
+        }
+
+        return selectedConversation.messages;
+    }
+
     /**
      * DM3 TLD
      */
     private _tld?: ITLDResolver;
 
     constructor(config: Dm3SdkConfig) {
+        super();
         //TODO keep ethers v5 for know but extract into common interface later
         this.mainnetProvider = config.mainnetProvider;
         this.nonce = config.nonce;
@@ -154,10 +181,15 @@ export class Dm3Sdk {
             account,
             profileKeys,
             this.addressEnsSubdomain,
+            (event: string, eventData: any) => {
+                this.emit('dm3_event', { event, eventData });
+            },
         );
         await conversations._init();
 
-        return new Dm3(conversations, tld);
+        this.conversations = conversations;
+
+        return this;
     }
 
     /**

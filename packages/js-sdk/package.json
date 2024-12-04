@@ -22,7 +22,7 @@
         "@web3-name-sdk/core": "^0.2.0",
         "axios": "^0.27.2",
         "dotenv": "^16.0.1",
-        "ethers": "5",
+        "ethers": "5.7.2",
         "siwe": "^2.3.2",
         "socket.io-client": "^4.8.1"
     },

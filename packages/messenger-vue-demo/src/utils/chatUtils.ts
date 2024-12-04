@@ -79,8 +79,6 @@ export type ChatRoom = {
 
   export function transformToMessages(messagesData: any[]): any[] {
     return messagesData.map((message) => {
-      console.log('message', message);
-
       // Ensure _id and senderId are valid
       const _id = message.envelop.id ? String(message.envelop.id) : "unknown_id";
       const senderId = message.envelop.message.metadata.from ? String(message.envelop.message.metadata.from) : "unknown_sender";

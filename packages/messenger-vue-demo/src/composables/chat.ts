@@ -1,8 +1,8 @@
 import { computed, ref, markRaw, type Ref } from 'vue';
-import { Dm3, Dm3Sdk, type Dm3SdkConfig } from '@dm3-org/dm3-js-sdk';
+import { Dm3Sdk, type Dm3SdkConfig } from '@dm3-org/dm3-js-sdk';
 import {ethers} from 'ethers';
 import type { Conversation } from '@dm3-org/dm3-lib-storage';
-import { transformToMessages, transformToRooms, type ChatRoom } from '@/chatUtils';
+import { transformToMessages, transformToRooms, type ChatRoom } from '../utils/chatUtils';
 import { computedAsync } from '@vueuse/core';
 
 const sepoliaProvider = new ethers.providers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/cBTHRhVcZ3Vt4BOFpA_Hi5DcTB1KQQV1", {
@@ -22,6 +22,10 @@ const configLukso: Dm3SdkConfig = {
 };
 
 const sdk = new Dm3Sdk(configLukso);
+
+sdk.on('dm3_event', (eventData) => {
+    console.log('dm3_event', eventData);
+});
 
 // TODO: check for installed extension
 // https://docs.lukso.tech/install-up-browser-extension/
@@ -57,14 +61,14 @@ const requestProvider = (): Promise<ethers.providers.ExternalProvider> => {
 export function useDm3Chat(): UseDm3ChatReturnType {
     const roomsLoaded = ref(false);
     const messagesLoaded = ref(false);
-    const dm3Instance = ref<Dm3 | null>(null);
+    const dm3Instance = ref<Dm3Sdk | null>(null);
     const isReady = ref(false);
     const selectedConversation = ref<Conversation | null>(null);
     const loggedInAccount = ref<string | null>(null);
 
     const init = async () => {
         const dm3 = await sdk.universalProfileLoginWithCache(requestProvider);
-        dm3Instance.value = markRaw(dm3);
+        dm3Instance.value = dm3;
         isReady.value = true;
         loggedInAccount.value = 'TODO';
     };
@@ -80,7 +84,7 @@ export function useDm3Chat(): UseDm3ChatReturnType {
         }));
         roomsLoaded.value = true;
         
-        return transformToRooms(conversationsPreview.value);
+        return transformToRooms(conversationsPreview.value as any);
     });
 
     const messages = ref<any[]>([]);
